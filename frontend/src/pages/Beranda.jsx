@@ -4,7 +4,7 @@ import { BadgeCheck, BookOpen, Search } from "lucide-react";
 import api from "../lib/api";
 import { formatAngka, LABEL_TOPIK } from "../lib/format";
 import KapsulPencarian from "../components/mochi/KapsulPencarian";
-import KartuMasalah from "../components/mochi/KartuMasalah";
+import RakKitab from "../components/mochi/RakKitab";
 import KartuLembaga from "../components/mochi/KartuLembaga";
 import SkeletonKartu from "../components/mochi/SkeletonKartu";
 
@@ -112,10 +112,8 @@ export default function Beranda() {
         )}
         {!data && !galat && <SkeletonKartu jumlah={6} />}
         {data && (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="masalah-terbaru">
-            {data.terbaru.map((m) => (
-              <KartuMasalah key={m.slug} m={m} />
-            ))}
+          <div data-testid="masalah-terbaru">
+            <RakKitab masalah={data.terbaru} />
           </div>
         )}
       </section>

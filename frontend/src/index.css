@@ -170,6 +170,36 @@
   animation: shimmer 1.5s infinite linear;
 }
 
+/* Galeri Rak Kitab (DESIGN.md 7.2) — akordeon punggung kitab */
+.rak-panel {
+  flex: 0 0 72px;
+  transition: flex 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+.rak-panel:hover,
+.rak-panel:focus-visible,
+.rak-panel:focus-within {
+  flex: 1 1 340px;
+}
+.rak-panel .rak-vertikal {
+  opacity: 1;
+  transition: opacity 150ms ease;
+}
+.rak-panel .rak-isi {
+  opacity: 0;
+  transition: opacity 200ms ease 100ms;
+  pointer-events: none;
+}
+.rak-panel:hover .rak-vertikal,
+.rak-panel:focus-within .rak-vertikal {
+  opacity: 0;
+}
+.rak-panel:hover .rak-isi,
+.rak-panel:focus-within .rak-isi {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
