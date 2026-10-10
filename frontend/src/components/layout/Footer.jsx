@@ -7,7 +7,6 @@ const KOLOM = [
     tautan: [
       { ke: "/perpustakaan", label: "Perpustakaan" },
       { ke: "/lembaga", label: "Lembaga" },
-      { ke: "/kitab", label: "Kitab rujukan" },
       { ke: "/tanya", label: "Tanya MOCHI" },
     ],
   },
@@ -15,7 +14,8 @@ const KOLOM = [
     judul: "Tentang",
     tautan: [
       { ke: "/tentang", label: "Cara kerja" },
-      { ke: "/tentang", label: "Untuk lembaga" },
+      { ke: "/daftar", label: "Daftarkan lembaga" },
+      { ke: "/masuk", label: "Masuk pengelola" },
     ],
   },
 ];
@@ -34,7 +34,7 @@ export default function Footer() {
               Dari musyawarah pesantren, <em className="text-primer">untuk umat.</em>
             </p>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-teks-sekunder">
-              Masail Online &amp; Comprehensive Heritage Intelligence — rujukan terarsip, bukan pemberi fatwa pribadi.
+              Masail Online &amp; Comprehensive Heritage Intelligence — menghimpun hasil bahtsul masail agar mudah dicari dan dirujuk.
             </p>
           </div>
           {KOLOM.map((k) => (
@@ -56,7 +56,7 @@ export default function Footer() {
           <span className="inline-flex items-center gap-2">
             <BintangDelapan className="h-3.5 w-3.5 text-aksen" /> Karya Lomba Santrivision 2026
           </span>
-          <span>Rujukan terarsip, keputusan bersanad.</span>
+          <span>Repositori hasil bahtsul masail.</span>
         </div>
       </div>
     </footer>

@@ -14,12 +14,12 @@ function Baris({ label, anak }) {
 export default function KartuSanad({ forum, lembaga }) {
   return (
     <aside data-testid="kartu-sanad" className="rounded-2xl border-l-4 border-aksen bg-primer-subtle p-5">
-      <p className="alis mb-2">Sanad masalah</p>
+      <p className="alis mb-2">Sanad forum</p>
       <dl className="divide-y divide-primer-muda">
         <Baris label="Lembaga" anak={lembaga?.nama} />
         <Baris label="Forum" anak={forum?.nama} />
         <Baris label="Moderator" anak={forum?.moderator} />
-        <Baris label="Pentashih" anak={forum?.pentashih} />
+        <Baris label="Mushahhih" anak={forum?.pentashih} />
         <Baris label="Perumus" anak={forum?.perumus} />
         <Baris label="Tanggal" anak={formatRentang(forum?.tanggal_mulai, forum?.tanggal_selesai)} />
         <Baris label="Hijriah" anak={forum?.tanggal_hijriah} />

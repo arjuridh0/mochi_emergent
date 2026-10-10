@@ -21,17 +21,17 @@ function BlokPertanyaan({ p, pertama }) {
     <Muncul as="section" id={`tanya-${p.label}`} className="scroll-mt-24" data-testid={`pertanyaan-${p.label}`}>
       <div className="flex items-baseline gap-4">
         <span className="font-display text-[44px] uppercase leading-none text-aksen">{p.label}</span>
-        <p className="alis">Pertanyaan</p>
+        <p className="alis">Su&apos;al · Pertanyaan</p>
       </div>
       <h3 className="mt-3 text-[22px] font-semibold leading-snug tracking-[-0.01em] text-teks-utama md:text-2xl">{p.teks}</h3>
 
       <div className="mt-6 rounded-2xl border border-batas bg-latar p-6 md:p-7">
-        <p className="alis mb-3 text-primer">Jawaban</p>
+        <p className="alis mb-3 text-primer">Jawab · Jawaban</p>
         <p className="whitespace-pre-line text-[17px] leading-[1.75] text-teks-utama">{p.jawaban}</p>
       </div>
 
       <div className="mt-6">
-        <p className="alis mb-3">Rujukan · al-Ma&apos;khadz</p>
+        <p className="alis mb-3">Ibarat · al-Ma&apos;khadz</p>
         <AkordeonRujukan rujukan={p.rujukan} awalan={pertama ? "" : p.label} />
       </div>
     </Muncul>
@@ -48,7 +48,7 @@ function Bandingkan({ utama, pembanding, onTutup }) {
       </p>
       {data.pertanyaan.map((p) => (
         <div key={p.id} className="mb-4 last:mb-0">
-          <p className="text-xs font-medium text-teks-pudar">Pertanyaan {p.label}</p>
+          <p className="text-xs font-medium text-teks-pudar">Su&apos;al {p.label}</p>
           <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-teks-utama">{p.jawaban}</p>
         </div>
       ))}
@@ -83,7 +83,7 @@ function PanelSamping({ data, ukuranArab, ubahUkuran, bukaBanding }) {
 
       {pertanyaan.length > 1 && (
         <nav className="rounded-2xl border border-batas bg-latar p-4" aria-label="Daftar isi" data-testid="daftar-isi">
-          <p className="alis mb-2">Daftar isi</p>
+          <p className="alis mb-2">Asilah</p>
           <ul>
             {pertanyaan.map((p) => (
               <li key={p.id}>
@@ -282,7 +282,7 @@ export default function MasalahDetail() {
       <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className={`min-w-0 ${tabMobile === "sanad" ? "hidden lg:block" : ""}`}>
           <section className="mb-12">
-            <p className="alis mb-3">Deskripsi masalah</p>
+            <p className="alis mb-3">Deskripsi masalah · Tashawwur</p>
             <p className="whitespace-pre-line text-lg leading-[1.75] text-teks-utama md:text-xl md:leading-[1.7]">{m.deskripsi}</p>
             {m.catatan_arsip && <p className="mt-4 border-l-2 border-batas-kuat pl-4 text-xs italic leading-relaxed text-teks-pudar">{m.catatan_arsip}</p>}
           </section>

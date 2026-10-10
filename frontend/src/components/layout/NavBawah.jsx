@@ -12,7 +12,7 @@ const ITEM = [
 
 function aktif(pathname, ke) {
   if (ke === "/") return pathname === "/";
-  if (ke === "/perpustakaan") return ["/perpustakaan", "/masalah", "/kitab"].some((p) => pathname.startsWith(p));
+  if (ke === "/perpustakaan") return ["/perpustakaan", "/masalah"].some((p) => pathname.startsWith(p));
   if (ke === "/lembaga") return pathname.startsWith("/lembaga") || pathname.startsWith("/forum");
   return pathname.startsWith(ke);
 }

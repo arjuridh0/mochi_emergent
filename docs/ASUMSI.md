@@ -15,3 +15,9 @@
 10. **Akun demo** (admin, 2 lembaga terverifikasi, 1 menunggu) dibuat pada Fase 6 (autentikasi). Kata sandi hanya dari variabel lingkungan.
 11. **Kode masalah** memakai format `MCH-<tahun forum>-<nomor urut global 4 digit>` (mengikuti dokumen 02 bagian 4.1; penomoran per tahun dicatat sebagai utang teknis).
 12. **"Pembahasan terkait"** sementara memakai kemiripan trigram + kata kunci bersama (diizinkan Prompt 5), diganti kemiripan semantik pada Fase 8.
+
+## Fase 6 (bagian 1) — Auth
+- Supabase Auth diganti JWT HS256 (12 jam) + bcrypt; peran & lembaga_id selalu dibaca dari DB (padanan RLS).
+- Verifikasi email tidak diwajibkan (UX lebih nyaman); gerbang keamanan = verifikasi lembaga oleh admin.
+- Belum ada layanan email: tautan reset sandi ditampilkan di layar saat DEMO_MODE=true. Dapat diganti Resend (gratis 3.000 email/bulan) dengan API key.
+- Dokumen bukti disimpan privat di backend/uploads/bukti; diakses admin lewat URL bertanda tangan 10 menit (padanan signed URL bucket privat).

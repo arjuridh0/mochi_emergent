@@ -65,7 +65,7 @@ export default function KartuMasalah({ m, sorot }) {
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-teks-pudar">
         <span className="inline-flex items-center gap-1">
-          <BookMarked className="h-3.5 w-3.5" /> {m.jumlah_rujukan} rujukan kitab
+          <BookMarked className="h-3.5 w-3.5" /> {m.jumlah_rujukan} ibarat kitab
         </span>
         {m.jumlah_forum_lain > 0 && (
           <span className="inline-flex items-center gap-1 rounded-full bg-informasi-muda px-2 py-0.5 font-medium text-informasi">

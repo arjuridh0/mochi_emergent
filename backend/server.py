@@ -12,11 +12,16 @@ load_dotenv(ROOT_DIR / ".env")
 from app.db import client, db  # noqa: E402
 from app.routes_aksi import router as ruter_aksi  # noqa: E402
 from app.routes_publik import router as ruter_publik  # noqa: E402
+from app.routes_auth import router as ruter_auth  # noqa: E402
+from app.routes_admin import router as ruter_admin  # noqa: E402
+from app.auth import siapkan_akun_demo  # noqa: E402
 
 app = FastAPI(title="MOCHI API", docs_url=None, redoc_url=None)
 
 app.include_router(ruter_publik, prefix="/api")
 app.include_router(ruter_aksi, prefix="/api")
+app.include_router(ruter_auth, prefix="/api")
+app.include_router(ruter_admin, prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,
@@ -56,6 +61,7 @@ async def siapkan_indeks():
         [("tanggal", 1), ("jenis", 1), ("target_id", 1), ("sesi_hash", 1)], unique=True)
     await db.laporan.create_index("status")
     await db.log_audit.create_index([("pada", -1)])
+    await siapkan_akun_demo()
 
 
 @app.on_event("shutdown")

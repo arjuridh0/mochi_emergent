@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
-import { LayoutGrid, Library, SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal, X } from "lucide-react";
 import api from "../lib/api";
 import { LABEL_TOPIK } from "../lib/format";
 import KapsulPencarian from "../components/mochi/KapsulPencarian";
 import PanelFilter from "../components/mochi/PanelFilter";
 import KartuMasalah from "../components/mochi/KartuMasalah";
-import RakKitab from "../components/mochi/RakKitab";
 import Paginasi from "../components/mochi/Paginasi";
 import StatusKosong from "../components/mochi/StatusKosong";
 import SkeletonKartu from "../components/mochi/SkeletonKartu";
@@ -17,10 +16,6 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../components/ui/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
 const KUNCI_FILTER = ["topik", "lembaga", "tahun", "kitab", "jenis"];
-const MODE = [
-  { kunci: "rak", label: "Rak Kitab", ikon: Library },
-  { kunci: "daftar", label: "Daftar", ikon: LayoutGrid },
-];
 
 export default function Perpustakaan() {
   const [params, setParams] = useSearchParams();
@@ -35,8 +30,6 @@ export default function Perpustakaan() {
   const q = nilai.q || "";
   const urut = nilai.urut || "relevan";
   const hal = parseInt(nilai.hal || "1", 10);
-  // Tanpa kata kunci: Rak Kitab (DESIGN.md 7.2). Dengan kata kunci: Daftar (sorotan kata lebih terbaca).
-  const mode = nilai.tampilan === "daftar" || nilai.tampilan === "rak" ? nilai.tampilan : q ? "daftar" : "rak";
 
   useEffect(() => {
     api.get("/opsi-filter").then((r) => setOpsi(r.data)).catch(() => {});
@@ -45,22 +38,19 @@ export default function Perpustakaan() {
   useEffect(() => {
     setMemuat(true);
     setGalat(false);
-    const p = Object.fromEntries(params.entries());
-    delete p.tampilan;
     api
-      .get("/search", { params: p })
+      .get("/search", { params: Object.fromEntries(params.entries()) })
       .then((r) => setData(r.data))
       .catch(() => setGalat(true))
       .finally(() => setMemuat(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.toString().replace(/(^|&)tampilan=[^&]*/, "")]);
+  }, [params]);
 
   const ubah = useCallback(
     (kunci, v) => {
       const baru = new URLSearchParams(params);
       if (v) baru.set(kunci, v);
       else baru.delete(kunci);
-      if (kunci !== "hal" && kunci !== "tampilan") baru.delete("hal");
+      if (kunci !== "hal") baru.delete("hal");
       setParams(baru);
     },
     [params, setParams]
@@ -71,8 +61,7 @@ export default function Perpustakaan() {
     if (kueri) baru.set("q", kueri);
     if (topik && topik !== "semua") baru.set("topik", topik);
     if (tahun && tahun !== "semua") baru.set("tahun", tahun);
-    if (nilai.tampilan) baru.set("tampilan", nilai.tampilan);
-    setParams(baru);
+        setParams(baru);
   };
 
   const chipAktif = [];
@@ -104,10 +93,10 @@ export default function Perpustakaan() {
         alis="Perpustakaan"
         judul={
           <>
-            Telusuri arsip <em className="text-primer">keputusan.</em>
+            Telusuri hasil <em className="text-primer">bahtsul masail.</em>
           </>
         }
-        deskripsi="Cari dengan bahasa sehari-hari atau teks Arab. Saring berdasarkan topik, lembaga, tahun, dan kitab rujukan."
+        deskripsi="Cari dengan bahasa sehari-hari atau teks Arab. Saring berdasarkan bab, lembaga, tahun, dan kitab rujukan."
       />
 
       <div className="mb-6">
@@ -151,7 +140,7 @@ export default function Perpustakaan() {
         <p className="mr-2 text-sm text-teks-sekunder" data-testid="jumlah-hasil">
           {memuat || !data ? "Mencari…" : (
             <>
-              <span className="font-semibold text-teks-utama">{data.total}</span> masalah ditemukan
+              <span className="font-semibold text-teks-utama">{data.total}</span> masail ditemukan
             </>
           )}
         </p>
@@ -181,7 +170,7 @@ export default function Perpustakaan() {
         </AnimatePresence>
         {chipAktif.length > 0 && (
           <button
-            onClick={() => navigate(nilai.tampilan ? `/perpustakaan?tampilan=${nilai.tampilan}` : "/perpustakaan")}
+            onClick={() => navigate("/perpustakaan")}
             data-testid="reset-filter"
             className="px-1 text-xs font-medium text-teks-pudar underline-offset-4 hover:text-bahaya hover:underline"
           >
@@ -190,25 +179,6 @@ export default function Perpustakaan() {
         )}
 
         <div className="ml-auto flex items-center gap-2">
-          <div className="flex rounded-full bg-latar p-1 ring-1 ring-batas" role="group" aria-label="Mode tampilan" data-testid="mode-tampilan">
-            {MODE.map(({ kunci, label, ikon: Ikon }) => (
-              <button
-                key={kunci}
-                onClick={() => ubah("tampilan", kunci)}
-                data-testid={`mode-${kunci}`}
-                aria-pressed={mode === kunci}
-                className={`relative inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-colors ${
-                  mode === kunci ? "text-white" : "text-teks-sekunder hover:text-teks-utama"
-                }`}
-              >
-                {mode === kunci && (
-                  <motion.span layoutId="pil-mode" className="absolute inset-0 rounded-full bg-teks-utama" transition={{ type: "spring", stiffness: 450, damping: 34 }} />
-                )}
-                <Ikon className="relative h-3.5 w-3.5" />
-                <span className="relative hidden sm:inline">{label}</span>
-              </button>
-            ))}
-          </div>
           <Select value={urut} onValueChange={(v) => ubah("urut", v === "relevan" ? "" : v)}>
             <SelectTrigger id="urut" aria-label="Urutkan" data-testid="pilih-urutan" className="h-10 w-[132px] rounded-full border-0 bg-latar text-[13px] ring-1 ring-batas focus:ring-1 focus:ring-batas-kuat focus:ring-offset-0">
               <SelectValue />
@@ -227,7 +197,7 @@ export default function Perpustakaan() {
           <div className="sticky top-24">{panel}</div>
         </aside>
         <div className="min-w-0">
-          {memuat && (mode === "rak" ? <div className="shimmer h-[460px] w-full rounded-[18px]" /> : <SkeletonKartu jumlah={6} kolom="sm:grid-cols-2" />)}
+          {memuat && <SkeletonKartu jumlah={6} kolom="sm:grid-cols-2" />}
           {!memuat && galat && (
             <p className="rounded-2xl bg-bahaya-muda p-4 text-sm text-bahaya" role="alert" data-testid="galat-pencarian">
               Pencarian gagal dimuat. Periksa koneksi Anda lalu coba lagi.
@@ -237,10 +207,6 @@ export default function Perpustakaan() {
             <>
               {data.hasil.length === 0 ? (
                 <StatusKosong />
-              ) : mode === "rak" ? (
-                <div data-testid="hasil-pencarian">
-                  <RakKitab key={params.toString()} masalah={data.hasil} tinggi={480} testId="rak-hasil" />
-                </div>
               ) : (
                 <motion.div
                   key={params.toString()}

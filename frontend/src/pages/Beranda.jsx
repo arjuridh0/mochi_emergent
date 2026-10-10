@@ -5,7 +5,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import api from "../lib/api";
 import { LABEL_JENIS, LABEL_TOPIK } from "../lib/format";
 import KapsulPencarian from "../components/mochi/KapsulPencarian";
-import RakKitab from "../components/mochi/RakKitab";
+import KartuMasalah from "../components/mochi/KartuMasalah";
 import { AvatarLembaga } from "../components/mochi/KartuLembaga";
 import { AngkaHitung, KataBertahap, Muncul, varianAnak, varianInduk } from "../components/mochi/Gerak";
 import { BintangDelapan, BintangLatar } from "../components/mochi/Ornamen";
@@ -13,9 +13,9 @@ import { BintangDelapan, BintangLatar } from "../components/mochi/Ornamen";
 const TOPIK = ["ibadah", "muamalah", "munakahat"];
 
 const LANGKAH = [
-  { no: "01", judul: "Cari dengan bahasa sehari-hari", isi: "Ketik masalah seperti Anda bertanya ke ustadz — atau kata kunci Arab, berharakat maupun tidak." },
-  { no: "02", judul: "Baca jawaban beserta ibaratnya", isi: "Setiap jawaban disertai kutipan kitab, terjemah, dan juz/halaman yang bisa disalin." },
-  { no: "03", judul: "Lihat sanad keputusannya", isi: "Lembaga, forum, tanggal, moderator, hingga pentashih — selalu tampil, tanpa disembunyikan." },
+  { no: "01", judul: "Cari dengan bahasa sehari-hari", isi: "Ketik persoalan seperti Anda bertanya ke ustadz — atau kata kunci Arab, berharakat maupun tidak." },
+  { no: "02", judul: "Baca jawaban beserta ibaratnya", isi: "Setiap jawaban atas asilah disertai ibarat kitab, terjemah, dan juz/halaman yang bisa disalin." },
+  { no: "03", judul: "Lihat sanad forumnya", isi: "Lembaga, forum, tempat, tanggal, mushahhih, perumus, dan moderator tiap forum — selalu tampil." },
 ];
 
 function Seksi({ alis, judul, aksi, children, className = "" }) {
@@ -72,7 +72,7 @@ export default function Beranda() {
           <BintangLatar className="putar-pelan h-auto w-full" />
         </div>
 
-        <div className="relative mx-auto max-w-4xl px-5 pb-16 pt-14 text-center md:pb-24 md:pt-24">
+        <div className="relative mx-auto max-w-4xl px-5 pb-10 pt-14 text-center md:pb-12 md:pt-24">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -80,21 +80,21 @@ export default function Beranda() {
             className="mx-auto mb-8 inline-flex items-center gap-2.5 rounded-full border border-batas bg-latar/80 py-1 pl-1 pr-4 text-[13px] text-teks-sekunder shadow-[0_1px_2px_rgba(0,0,0,0.04)] backdrop-blur"
           >
             <img src="/mascot/mochi.jpg" alt="" className="napas h-7 w-7 rounded-full" />
-            Repositori bahtsul masail pesantren
+            Repositori hasil bahtsul masail
           </motion.div>
 
           <h1 className="font-display text-[52px] leading-[0.98] tracking-[-0.02em] text-teks-utama sm:text-[72px] md:text-[96px]">
-            <KataBertahap teks="Rujukan terarsip," className="block" delay={0.1} />
+            <KataBertahap teks="Jawaban hukum Islam," className="block" delay={0.1} />
             <KataBertahap
-              teks="keputusan bersanad."
+              teks="dari musyawarah ulama."
               className="block"
               delay={0.3}
-              kelasKata={(_, i) => (i === 1 ? "italic text-primer" : "")}
+              kelasKata={(_, i) => (i === 2 ? "italic text-primer" : "")}
             />
           </h1>
 
           <Muncul delay={0.55} className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-teks-sekunder md:text-lg">
-            Temukan hasil musyawarah ulama pesantren — jelas asalnya, jelas pengambilnya, jelas rujukannya.
+            Himpunan hasil bahtsul masail untuk persoalan kontemporer maupun klasik — lengkap dengan asilah, jawaban, ibarat kitab, dan para mushahhihnya.
           </Muncul>
 
           <Muncul delay={0.7} className="mx-auto mt-10 max-w-3xl text-left">
@@ -102,15 +102,15 @@ export default function Beranda() {
           </Muncul>
 
           <Muncul delay={0.85} className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            <span className="mr-1 text-[13px] text-teks-pudar">Jelajah topik</span>
+            <span className="mr-1 text-sm text-teks-pudar">Jelajah bab</span>
             {TOPIK.map((t) => (
               <Link
                 key={t}
                 to={`/perpustakaan?topik=${t}`}
                 data-testid={`topik-cepat-${t}`}
-                className="inline-flex items-center gap-2 rounded-full border border-batas bg-latar px-3.5 py-1.5 text-[13px] font-medium text-teks-utama transition-all duration-200 hover:-translate-y-0.5 hover:border-batas-kuat"
+                className="inline-flex h-11 items-center gap-2.5 rounded-full border border-batas bg-latar px-5 text-[15px] font-medium text-teks-utama shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:border-batas-kuat"
               >
-                <span className={`h-1.5 w-1.5 rounded-full titik-${t}`} />
+                <span className={`h-2 w-2 rounded-full titik-${t}`} />
                 {LABEL_TOPIK[t]}
               </Link>
             ))}
@@ -118,19 +118,19 @@ export default function Beranda() {
         </div>
 
         {/* Statistik — strip tipis */}
-        <div className="relative mx-auto max-w-5xl px-5 pb-6">
-          <div className="grid grid-cols-2 border-y border-batas md:grid-cols-4" data-testid="statistik-beranda">
+        <div className="relative mx-auto max-w-4xl px-5 pb-4">
+          <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-batas bg-latar/70 md:grid-cols-4" data-testid="statistik-beranda">
             {[
-              { label: "Masalah terbahas", nilai: stat?.masalah },
+              { label: "Masail terbahas", nilai: stat?.masalah },
               { label: "Forum tercatat", nilai: stat?.forum },
               { label: "Lembaga terverifikasi", nilai: stat?.lembaga },
               { label: "Kitab rujukan", nilai: stat?.kitab },
             ].map((s, i) => (
               <div
                 key={s.label}
-                className={`px-4 py-6 text-center ${i % 2 === 1 ? "border-l border-batas" : ""} ${i >= 2 ? "border-t border-batas md:border-t-0" : ""} ${i === 2 ? "md:border-l" : ""}`}
+                className={`px-4 py-5 text-center ${i % 2 === 1 ? "border-l border-batas" : ""} ${i >= 2 ? "border-t border-batas md:border-t-0" : ""} ${i === 2 ? "md:border-l" : ""}`}
               >
-                <p className="font-display text-[44px] leading-none text-teks-utama md:text-[52px]">
+                <p className="font-display text-[38px] leading-none text-teks-utama md:text-[44px]">
                   {stat ? <AngkaHitung nilai={s.nilai} /> : <span className="text-teks-pudar">–</span>}
                 </p>
                 <p className="mt-2 text-[13px] text-teks-sekunder">{s.label}</p>
@@ -143,24 +143,27 @@ export default function Beranda() {
       {/* ===== SOROTAN: RAK KITAB (ReactBits AccordionGallery) ===== */}
       <Seksi
         className="mt-20 md:mt-28"
-        alis="Sorotan arsip"
+        alis="Hasil terbaru"
         judul={
           <>
-            Baru turun <em className="text-primer">dari rak.</em>
+            Masail yang <em className="text-primer">baru dibahas.</em>
           </>
         }
-        aksi={<TautanPanah to="/perpustakaan" testId="lihat-semua-masalah">Lihat semua masalah</TautanPanah>}
+        aksi={<TautanPanah to="/perpustakaan" testId="lihat-semua-masalah">Lihat semua masail</TautanPanah>}
       >
         {galat && (
           <p className="rounded-2xl bg-bahaya-muda p-4 text-sm text-bahaya" role="alert">
             Gagal memuat data. Periksa koneksi Anda lalu muat ulang halaman.
           </p>
         )}
-        {!data && !galat && <div className="shimmer h-[460px] w-full rounded-[18px]" />}
+        {!data && !galat && <div className="shimmer h-64 w-full rounded-2xl" />}
         {data && (
           <Muncul data-testid="masalah-terbaru">
-            <RakKitab masalah={data.terbaru} />
-            <p className="mt-4 hidden text-center text-xs text-teks-pudar md:block">Arahkan kursor untuk membuka punggung kitab · klik untuk membaca</p>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {data.terbaru.map((m) => (
+                <KartuMasalah key={m.slug} m={m} />
+              ))}
+            </div>
           </Muncul>
         )}
       </Seksi>
@@ -248,11 +251,11 @@ export default function Beranda() {
               Terbitkan hasil forum lembaga Anda agar terarsip rapi, mudah dicari, dan dikutip siapa saja dengan sanad yang jelas.
             </p>
             <Link
-              to="/tentang"
+              to="/daftar"
               data-testid="ajakan-lembaga"
               className="group mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-aksen px-7 text-sm font-semibold text-teks-utama transition-all duration-300 hover:bg-[#D8BC86]"
             >
-              Pelajari cara bergabung
+              Daftarkan lembaga
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </div>

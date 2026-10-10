@@ -16,6 +16,13 @@ import KitabDetail from "@/pages/KitabDetail";
 import Tanya from "@/pages/Tanya";
 import Tentang from "@/pages/Tentang";
 import TidakDitemukan from "@/pages/TidakDitemukan";
+import Masuk from "@/pages/Masuk";
+import Daftar from "@/pages/Daftar";
+import { LupaSandi, ResetSandi } from "@/pages/LupaSandi";
+import Dasbor from "@/pages/Dasbor";
+import AdminVerifikasi from "@/pages/AdminVerifikasi";
+import RuteTerlindung from "@/components/mochi/RuteTerlindung";
+import { AuthProvider } from "@/lib/auth";
 
 function GulungKeAtas() {
   const { pathname } = useLocation();
@@ -47,6 +54,12 @@ function Halaman() {
         <Route path="/kitab/:slug" element={<KitabDetail />} />
         <Route path="/tanya" element={<Tanya />} />
         <Route path="/tentang" element={<Tentang />} />
+        <Route path="/masuk" element={<Masuk />} />
+        <Route path="/daftar" element={<Daftar />} />
+        <Route path="/lupa-sandi" element={<LupaSandi />} />
+        <Route path="/reset-sandi" element={<ResetSandi />} />
+        <Route path="/dasbor" element={<RuteTerlindung peran="lembaga"><Dasbor /></RuteTerlindung>} />
+        <Route path="/admin/verifikasi" element={<RuteTerlindung peran="admin"><AdminVerifikasi /></RuteTerlindung>} />
         <Route path="*" element={<TidakDitemukan />} />
       </Routes>
     </motion.div>
@@ -57,6 +70,7 @@ function App() {
   const demo = process.env.REACT_APP_DEMO_MODE === "true";
   return (
     <BrowserRouter>
+      <AuthProvider>
       <GulungKeAtas />
       <div className="flex min-h-screen flex-col bg-kanvas text-teks-utama">
         {demo && (
@@ -75,6 +89,7 @@ function App() {
         <NavBawah />
         <PusatToast />
       </div>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
