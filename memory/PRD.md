@@ -21,6 +21,15 @@ Membangun sistem MOCHI sesuai paket dokumen (AGENTS.md, DESIGN.md, docs 01 PRD, 
 - **Fase 4:** Beranda (hero + KapsulPencarian, topik cepat, 3 langkah, statistik hidup, terbaru, lembaga teraktif, jelajah topik, CTA) + Perpustakaan (pencarian hibrida Latin/Arab toleran ejaan, filter topik multi/lembaga/tahun/kitab/jenis, URL state dapat dibagikan, chip filter, urutan relevan/terbaru/terpopuler, paginasi, skeleton, status kosong, bottom sheet filter di mobile).
 - **Fase 5:** Detail masalah (kode MCH, Kartu Sanad lengkap, blok pertanyaan bernomor, akordeon rujukan Arab RTL + terjemah + salin, dokumentasi, Kutip sitasi baku PRD 7.5, Bagikan salin/WA, Laporkan → /api/report, panel "Pernah dibahas di forum lain", tampilan Bandingkan netral, pengaturan huruf Arab 3 tingkat, daftar isi mini), detail forum, daftar+profil lembaga (skor keaktifan PRD 7.4, lencana, grafik aktivitas), daftar+detail kitab, /tanya stub jujur, /tentang, 404 ramah.
 
+## Refactor UI/UX (Sesi 2 — 10 Oktober 2026)
+- Light mode saja (blok prefers-color-scheme: dark dihapus; color-scheme: light).
+- Arah visual: editorial modern + ornamen islami tipis (bintang delapan, pola girih samar, pemisah naskah). Font: Instrument Serif (judul besar), Inter (UI), Amiri (Arab).
+- ReactBits asli (registry reactbits.dev, MIT, dicatat di docs/THIRD_PARTY.md): AccordionGallery (Rak Kitab beranda & perpustakaan, tekstur sampul kitab AI di public/sampul), FuseButton (Kutip & Salin kutipan Arab), SwipeToast (toast global, menggantikan sonner), ThoughtLine (Tanya MOCHI).
+- Disederhanakan: tombol Tanya melayang & menu hamburger dihapus; beranda 5 seksi; nav bawah kapsul 5 item; tab mobile Pembahasan/Sanad di detail masalah.
+- Tanya MOCHI kini berfungsi sebagai pencarian sumber arsip (retrieval via /api/search) dengan ThoughtLine — belum ringkasan LLM (Fase 8).
+- Backend: pencarian mengabaikan kata umum (hukum, bagaimana, apakah, …).
+- Uji: iteration_2.json — backend 18/18, frontend semua alur lulus desktop + 390px.
+
 ## Hasil Uji
 - Testing agent iterasi 1: backend 18/18 pytest lulus; seluruh alur frontend terverifikasi (desktop + mobile 390px tanpa overflow). /app/test_reports/iteration_1.json; tes pytest di /app/backend/tests/test_mochi_api.py.
 - Pencarian: "DNA nasab" → 2; "القيافة" → 2; "النَّسَب" (berharakat) → 2; typo "qiyafa" → tetap menemukan; filter kombinasi berfungsi.

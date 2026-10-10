@@ -1,0 +1,41 @@
+{
+  "summary": "Full-stack verification of MOCHI UI refactor (ReactBits + editorial). Backend: 18/18 pytest pass (serial). Frontend verified end-to-end at 1920x1080 and 390x844: light-mode-only (body stays rgb(244,243,238) under prefers-color-scheme:dark), header blurs after scroll, desktop AccordionGallery Rak Kitab (6 rak-panel-* panels; hover expands, click on expanded navigates SPA to /masalah/<slug>), mobile rak-mobile-* cards navigate on tap, Beranda hero + kapsul-pencarian + statistik (21/6/3/20) + topik-cepat + lembaga-teraktif + ajakan-lembaga, Perpustakaan default=rak with mode-daftar/mode-rak toggle (?tampilan= param updates), DNA nasab search=2 with highlighted <mark>, القيافة=2, zakat profesi query (filler words 'bagaimana hukum' ignored) returns Zakat Profesi first, xyzqwerty → status-kosong, reset-filter + pilih-urutan present, mobile tombol-filter-mobile opens sheet with panel-filter + terapkan-filter. MasalahDetail: kode-masalah, kartu-sanad, FuseButton tombol-kutip transitions to tombol-kutip-armed + toast-success 'Sitasi disalin ke papan klip' inside pusat-toast, bagikan dropdown (bagikan-salin→'Tautan disalin', bagikan-wa), modal-lapor with lapor-alasan/detail/kontak/tombol-kirim-laporan, pengaturan-baca arab-besar flips data-arab-size, rujukan-trigger-* accordions, DNA case shows daftar-isi + panel-terkait + bandingkan button → tampilan-bandingkan + tutup-bandingkan, mobile tab-bahas/tab-sanad switch content. Tanya: saran-0..3, input-tanya+kirim-tanya, ThoughtLine 'Dipikirkan selama X.Xs', tanya-hasil with tanya-sumber-* linking to /masalah/<slug>, multi-turn stacking (2 hasil cards), tanya-kosong on nonsense. Lembaga list (tab-teraktif/terpopuler/terbaru, filter-jenis-lembaga, filter-provinsi-lembaga, daftar-lembaga), profile (statistik-lembaga, aktivitas-bulanan, lencana-lembaga, daftar-forum-lembaga, forum-<slug> → halaman-detail-forum + daftar-masalah-forum). Kitab list (20 cards) + halaman-detail-kitab + masalah-kitab. Tentang (halaman-tentang + tentang-ke-perpustakaan). 404 (/tidak-ada → halaman-404 + 404-beranda + 404-perpustakaan). No horizontal overflow on 6 mobile pages. Bottom nav all 5 testids present.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/report", "issue": "Rate limit bucket (IP+UA) not isolated per test — when pytest-xdist runs in parallel loadscope mode, TestReport.test_report_success occasionally hits 429 if prior test_report_rate_limit left the bucket saturated (<60s window). All 18 pass serially (-n 0). Not a product bug; test infra should either use a unique UA per test or add explicit backoff."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "KutipanArab FuseButton (tombol-salin-arab)", "issue": "Component correctly hides TombolSalin when teksArab is placeholder [ISI DARI SUMBER]. However the seed DNA masalah (uji-dna-untuk-pembuktian-nasab-anak-adc370) has ALL kutipan-arab blocks with placeholder Arabic text — so no tombol-salin-arab button renders anywhere, even though the review request claims this case has 'real Arabic text'. Either (a) seed Arabic text for DNA rujukan needs to be added so the FuseButton is reachable, or (b) the review expectation should be reconciled with current seed. The FuseButton logic itself is correct (verified via tombol-kutip and tombol-salin-arab on other seeds? none visible across tested masalah).", "affected_selectors": ["[data-testid=\"tombol-salin-arab\"]"]}
+    ],
+    "design_issues": [
+      {"screen": "MasalahDetail", "issues": ["Duplicate data-testid: rujukan-trigger-0/1/2 render twice (once in desktop panel, once in mobile tab-bahas panel) because both are mounted and toggled via CSS. Playwright strict-mode click fails on bare testid. Same duplication exists for data-testid='panel-filter' on Perpustakaan (desktop sidebar + mobile sheet). Suggest suffixing one copy (e.g. panel-filter-mobile, rujukan-trigger-mobile-<i>) or rendering only the active variant. Functional UI is correct; this is a testability concern."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_mochi_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Optional) Add real Arabic kutipan text to DNA seed (uji-dna-untuk-pembuktian-nasab-anak-*) so the ReactBits FuseButton 'tombol-salin-arab' is reachable for QA — currently no masalah in the seed exposes this button.",
+    "(Optional) De-duplicate data-testid='rujukan-trigger-<i>' and 'panel-filter' across responsive variants (e.g., append '-mobile' to the mobile copy). Non-blocking; UI works."
+  ],
+  "critical_code_review_comments": [
+    "FuseButton.jsx: `tombol-kutip-armed` element remains in DOM at all phases with opacity cross-fade — Playwright's is_visible() returns true even in idle phase. Tests should assert `data-phase='armed'` on the FuseButton root, not the armed inner element's visibility, to detect armed state.",
+    "KutipanArab.jsx: Correct guard around TANDA placeholder; TombolSalin only mounts when real Arabic exists — good defensive design.",
+    "pytest.ini forces -n 2 --dist loadscope with required_plugins=pytest-xdist; test_report_success and test_report_rate_limit are in the same class (so loadscope pins them to one worker) but can race with the backend's /api/report rate-limit TTL across quick re-runs — consider per-test unique UA inside TestReport fixtures.",
+    "Multiple duplicate data-testid attributes between desktop/mobile responsive variants (rujukan-trigger-*, panel-filter). Prefer rendering one or scope testids.",
+    "AccordionGallery.jsx behaves correctly: first click on non-active panel expands, click on already-active panel navigates — SPA routing confirmed (no full reload)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (18/18 serial)", "frontend": "~98% — all in-scope flows pass; only tombol-salin-arab untestable due to seed placeholder"},
+  "test_credentials": "N/A (all public pages)",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend tests at /app/backend/tests/test_mochi_api.py — run with `-n 0` to avoid rate-limit race, or add unique UA. Key new testids verified: mode-rak, mode-daftar, rak-panel-<slug>, rak-mobile-<slug>, tab-bahas, tab-sanad, saran-0..3, input-tanya, kirim-tanya, tanya-hasil, tanya-sumber-*, tanya-kosong, toast-success, pusat-toast, tombol-kutip-armed, halaman-404, 404-beranda/perpustakaan, halaman-tentang, halaman-detail-kitab, masalah-kitab, halaman-detail-forum, daftar-masalah-forum, aktivitas-bulanan, lencana-lembaga. Note: panel-filter and rujukan-trigger-<i> appear twice in DOM (desktop+mobile) — use `.nth()` or specific parent scope.",
+  "rca_of_the_issue": "No real bugs. The seed data for DNA masalah uses '[ISI DARI SUMBER]' placeholder for Arabic quotations, so the ReactBits FuseButton 'tombol-salin-arab' intentionally does not render — this matches KutipanArab.jsx line 25 (`{!placeholder && <TombolSalin ... />}`). To reach this control via QA, seed real Arabic in rujukan of at least one masalah."
+}

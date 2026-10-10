@@ -16,7 +16,7 @@ import { Muncul } from "../components/mochi/Gerak";
 import { PemisahOrnamen } from "../components/mochi/Ornamen";
 import { Dialog, DialogContent, DialogTitle } from "../components/ui/dialog";
 
-function BlokPertanyaan({ p }) {
+function BlokPertanyaan({ p, pertama }) {
   return (
     <Muncul as="section" id={`tanya-${p.label}`} className="scroll-mt-24" data-testid={`pertanyaan-${p.label}`}>
       <div className="flex items-baseline gap-4">
@@ -32,7 +32,7 @@ function BlokPertanyaan({ p }) {
 
       <div className="mt-6">
         <p className="alis mb-3">Rujukan · al-Ma&apos;khadz</p>
-        <AkordeonRujukan rujukan={p.rujukan} />
+        <AkordeonRujukan rujukan={p.rujukan} awalan={pertama ? "" : p.label} />
       </div>
     </Muncul>
   );
@@ -291,7 +291,7 @@ export default function MasalahDetail() {
             {pertanyaan.map((p, i) => (
               <div key={p.id}>
                 {i > 0 && <PemisahOrnamen className="mb-12" />}
-                <BlokPertanyaan p={p} />
+                <BlokPertanyaan p={p} pertama={i === 0} />
               </div>
             ))}
           </div>

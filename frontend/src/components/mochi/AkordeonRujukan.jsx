@@ -1,7 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 import KutipanArab from "./KutipanArab";
 
-export default function AkordeonRujukan({ rujukan }) {
+export default function AkordeonRujukan({ rujukan, awalan = "" }) {
   if (!rujukan?.length) {
     return <p className="rounded-xl bg-latar-halus p-4 text-sm italic text-teks-pudar">Tanpa rujukan tercatat (arsip lama).</p>;
   }
@@ -11,7 +11,7 @@ export default function AkordeonRujukan({ rujukan }) {
         const namaLatin = r.kitab?.nama_latin || r.kitab_teks || "Kitab tidak tercatat";
         return (
           <AccordionItem key={r.id} value={`r-${i}`} className="border-0">
-            <AccordionTrigger data-testid={`rujukan-trigger-${i}`} className="px-5 py-4 text-left hover:bg-latar-halus hover:no-underline">
+            <AccordionTrigger data-testid={awalan ? `rujukan-trigger-${awalan}-${i}` : `rujukan-trigger-${i}`} className="px-5 py-4 text-left hover:bg-latar-halus hover:no-underline">
               <span className="flex min-w-0 items-start gap-3">
                 <span className="mt-0.5 font-display text-lg leading-none text-aksen-hover">{String(i + 1).padStart(2, "0")}</span>
                 <span className="flex min-w-0 flex-col gap-0.5">
