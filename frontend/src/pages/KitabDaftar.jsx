@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookMarked } from "lucide-react";
+import { motion } from "motion/react";
 import api from "../lib/api";
 import SkeletonKartu from "../components/mochi/SkeletonKartu";
 import StatusKosong from "../components/mochi/StatusKosong";
+import KepalaHalaman from "../components/mochi/KepalaHalaman";
+import { varianAnak, varianInduk } from "../components/mochi/Gerak";
+import { BintangDelapan } from "../components/mochi/Ornamen";
 
 export default function KitabDaftar() {
   const [data, setData] = useState(null);
@@ -14,54 +17,54 @@ export default function KitabDaftar() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8" data-testid="halaman-kitab">
-      <h1 className="text-2xl font-bold text-teks-utama md:text-3xl">Kitab Rujukan</h1>
-      <p className="mt-2 max-w-2xl text-sm text-teks-sekunder">
-        Master data kitab yang dirujuk dalam keputusan bahtsul masail. Nama diseragamkan; variasi
-        penulisan dicatat sebagai alias.
-      </p>
+    <div className="mx-auto max-w-6xl px-5" data-testid="halaman-kitab">
+      <KepalaHalaman
+        alis="Kitab rujukan"
+        judul={
+          <>
+            Khazanah yang <em className="text-primer">dirujuk.</em>
+          </>
+        }
+        deskripsi="Master data kitab yang dirujuk dalam keputusan bahtsul masail. Nama diseragamkan; variasi penulisan dicatat sebagai alias."
+      />
 
-      <div className="mt-6">
-        {!data && !galat && <SkeletonKartu jumlah={6} />}
-        {galat && (
-          <p className="rounded-xl bg-bahaya-muda p-4 text-sm text-bahaya" role="alert">
-            Gagal memuat daftar kitab. Periksa koneksi Anda.
-          </p>
-        )}
-        {data && data.length === 0 && (
-          <StatusKosong judul="Belum ada kitab" deskripsi="Master kitab belum diisi." tampilkanTanya={false} />
-        )}
-        {data && data.length > 0 && (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="daftar-kitab">
-            {data.map((k) => (
+      {!data && !galat && <SkeletonKartu jumlah={6} />}
+      {galat && (
+        <p className="rounded-2xl bg-bahaya-muda p-4 text-sm text-bahaya" role="alert">
+          Gagal memuat daftar kitab. Periksa koneksi Anda.
+        </p>
+      )}
+      {data && data.length === 0 && <StatusKosong judul="Belum ada kitab" deskripsi="Master kitab belum diisi." tampilkanTanya={false} />}
+      {data && data.length > 0 && (
+        <motion.div variants={varianInduk} initial="tersembunyi" animate="tampil" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="daftar-kitab">
+          {data.map((k) => (
+            <motion.div key={k.slug} variants={varianAnak}>
               <Link
-                key={k.slug}
                 to={`/kitab/${k.slug}`}
                 data-testid={`kitab-${k.slug}`}
-                className="flex h-full flex-col rounded-2xl border border-batas bg-latar p-5 shadow-mochi transition-all duration-200 hover:-translate-y-0.5 hover:shadow-mochi-md"
+                className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-batas bg-latar p-6 shadow-mochi transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-batas-kuat hover:shadow-mochi-md"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h2 className="font-semibold leading-snug text-teks-utama">{k.nama_latin}</h2>
-                    {k.nama_arab && (
-                      <p className="mt-1 font-arab text-lg leading-loose text-sekunder" dir="rtl" lang="ar">
-                        {k.nama_arab}
-                      </p>
-                    )}
-                  </div>
-                  <BookMarked className="h-5 w-5 shrink-0 text-aksen" />
-                </div>
-                <p className="mt-2 flex-1 text-xs text-teks-pudar">
-                  {[k.pengarang, k.wafat_h && `w. ${k.wafat_h} H`, k.bidang].filter(Boolean).join(" · ") || "Detail belum tercatat"}
-                </p>
-                <span className="mt-3 inline-flex w-fit rounded-full bg-primer-muda px-2.5 py-0.5 text-xs font-medium text-primer">
-                  {k.jumlah_keputusan} keputusan merujuk
+                <BintangDelapan className="absolute -right-10 -top-10 h-32 w-32 text-aksen opacity-[0.14] transition-transform duration-700 group-hover:rotate-45" strokeWidth={0.6} />
+                {k.nama_arab ? (
+                  <p className="font-arab text-[26px] leading-[1.6] text-primer" dir="rtl" lang="ar">
+                    {k.nama_arab}
+                  </p>
+                ) : (
+                  <p className="font-display text-[26px] leading-[1.6] text-teks-pudar">—</p>
+                )}
+                <h2 className="mt-2 font-semibold leading-snug text-teks-utama">{k.nama_latin}</h2>
+                <p className="mt-1 flex-1 text-xs text-teks-pudar">{[k.pengarang, k.wafat_h && `w. ${k.wafat_h} H`, k.bidang].filter(Boolean).join(" · ") || "Detail belum tercatat"}</p>
+                <span className="mt-5 flex items-center justify-between border-t border-batas pt-4 text-xs">
+                  <span className="text-teks-sekunder">
+                    <span className="font-display text-xl text-teks-utama">{k.jumlah_keputusan}</span> keputusan merujuk
+                  </span>
+                  <span className="font-medium text-primer opacity-0 transition-opacity group-hover:opacity-100">Lihat →</span>
                 </span>
               </Link>
-            ))}
-          </div>
-        )}
-      </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
     </div>
   );
 }

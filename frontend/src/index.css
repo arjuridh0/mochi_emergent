@@ -1,11 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ===== DESIGN TOKENS MOCHI (docs/DESIGN.md v1.1) ===== */
+/* ===== DESIGN TOKENS MOCHI (docs/DESIGN.md v1.1) — LIGHT ONLY ===== */
 :root {
+  color-scheme: light;
+  --rgb-canvas: 244 243 238;
+  --rgb-surface: 255 255 255;
+  --rgb-primary: 30 63 48;
+  --rgb-accent: 201 169 110;
+  --rgb-border: 229 227 220;
+  --rgb-text: 28 27 26;
   --color-canvas: #F4F3EE;
   --color-surface: #FFFFFF;
   --color-surface-subtle: #F9F8F5;
@@ -34,16 +41,21 @@
   --color-info: #1E5A8A;
   --color-info-light: #E6F0F9;
   --font-arabic: 'Amiri', 'Noto Naskh Arabic', serif;
+  --font-display: 'Instrument Serif', 'Times New Roman', serif;
   --leading-arab-base: 1.9;
   --leading-arab-loose: 2.2;
   --text-arab-sm: 18px;
   --text-arab-base: 22px;
   --text-arab-md: 26px;
+  --text-arab-lg: 30px;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-search: 0 6px 24px rgba(30, 63, 48, 0.14);
   --shadow-mochi-sm: 0 1px 4px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-mochi-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-mochi-lg: 0 8px 24px rgba(0, 0, 0, 0.10), 0 4px 8px rgba(0, 0, 0, 0.05);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
-  /* pemetaan token shadcn */
+  /* pemetaan token shadcn (light) */
   --background: 50 21% 95%;
   --foreground: 30 3% 11%;
   --card: 0 0% 100%;
@@ -66,64 +78,25 @@
   --radius: 0.625rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-canvas: #111210;
-    --color-surface: #1A1C1A;
-    --color-surface-subtle: #1F2120;
-    --color-primary: #4CAF7D;
-    --color-primary-hover: #63C48F;
-    --color-primary-active: #3E9468;
-    --color-primary-light: #1A2E22;
-    --color-primary-subtle: #16211B;
-    --color-secondary: #7FA390;
-    --color-accent: #D4A96E;
-    --color-accent-hover: #E0BB82;
-    --color-accent-subtle: #2A2215;
-    --color-text-primary: #F0EFE9;
-    --color-text-secondary: #A8A49E;
-    --color-text-muted: #6B6560;
-    --color-text-inverse: #111210;
-    --color-border: #2E3030;
-    --color-border-strong: #3E4040;
-    --color-border-focus: #4CAF7D;
-    --color-danger-light: #33110D;
-    --color-warning-light: #33250A;
-    --color-success-light: #0E2418;
-    --color-info-light: #0D1F30;
-
-    --background: 60 3% 7%;
-    --foreground: 60 4% 94%;
-    --card: 90 6% 10%;
-    --card-foreground: 60 4% 94%;
-    --popover: 90 6% 10%;
-    --popover-foreground: 60 4% 94%;
-    --primary: 152 39% 49%;
-    --primary-foreground: 60 3% 7%;
-    --secondary: 150 15% 13%;
-    --secondary-foreground: 152 39% 49%;
-    --muted: 150 5% 13%;
-    --muted-foreground: 45 4% 65%;
-    --accent: 40 25% 15%;
-    --accent-foreground: 60 4% 94%;
-    --destructive: 6 63% 50%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 120 2% 19%;
-    --input: 120 2% 19%;
-    --ring: 152 39% 49%;
-  }
-}
-
 @layer base {
   * {
     @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
   }
   body {
     background: var(--color-canvas);
     color: var(--color-text-primary);
     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: var(--color-accent-subtle);
+    color: var(--color-primary);
   }
   :focus-visible {
     outline: 2px solid var(--color-border-focus);
@@ -131,32 +104,88 @@
   }
 }
 
+/* Display serif untuk judul besar */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+}
+
+/* Label kecil di atas judul */
+.alis {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-secondary);
+}
+
 /* Tipografi Arab (aturan wajib, PRD 9.7) */
 .arab {
   direction: rtl;
   text-align: right;
   font-family: var(--font-arabic);
-  font-size: var(--text-arab-base);
+  font-size: var(--text-arab-md);
   line-height: var(--leading-arab-base);
 }
 .arab-longgar {
   line-height: var(--leading-arab-loose);
 }
 [data-arab-size='kecil'] .arab {
-  font-size: var(--text-arab-sm);
+  font-size: var(--text-arab-base);
 }
 [data-arab-size='besar'] .arab {
-  font-size: var(--text-arab-md);
+  font-size: var(--text-arab-lg);
 }
 
 /* Chip topik (DESIGN.md 2.2) */
 .chip-ibadah { background: #DBEAFE; color: #1E40AF; }
 .chip-muamalah { background: #DCFCE7; color: #166534; }
 .chip-munakahat { background: #F3E8FF; color: #7E22CE; }
-@media (prefers-color-scheme: dark) {
-  .chip-ibadah { background: #17233B; color: #93B8F5; }
-  .chip-muamalah { background: #12301F; color: #7BD4A0; }
-  .chip-munakahat { background: #2A1B3D; color: #C9A2F0; }
+.titik-ibadah { background: #1E40AF; }
+.titik-muamalah { background: #166534; }
+.titik-munakahat { background: #7E22CE; }
+
+/* Pola girih tipis (ornamen islami) */
+.pola-girih {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%231E3F30' stroke-width='0.7'%3E%3Crect x='20' y='20' width='24' height='24'/%3E%3Crect x='20' y='20' width='24' height='24' transform='rotate(45 32 32)'/%3E%3Ccircle cx='32' cy='32' r='4'/%3E%3Cpath d='M0 32h8M56 32h8M32 0v8M32 56v8'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 64px 64px;
+}
+.pola-girih-emas {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23C9A96E' stroke-width='0.7'%3E%3Crect x='20' y='20' width='24' height='24'/%3E%3Crect x='20' y='20' width='24' height='24' transform='rotate(45 32 32)'/%3E%3Ccircle cx='32' cy='32' r='4'/%3E%3Cpath d='M0 32h8M56 32h8M32 0v8M32 56v8'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 64px 64px;
+}
+.masker-radial {
+  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 40%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 60% 55% at 50% 40%, #000 20%, transparent 75%);
+}
+
+/* Butiran kertas halus */
+.butiran::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Bintang berputar sangat pelan */
+@keyframes putar-pelan {
+  to { transform: rotate(360deg); }
+}
+.putar-pelan {
+  animation: putar-pelan 120s linear infinite;
+}
+
+/* Pulse maskot (DESIGN.md 10) */
+@keyframes napas {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.92); opacity: 0.7; }
+}
+.napas {
+  animation: napas 2s ease-in-out infinite;
 }
 
 /* Skeleton shimmer */
@@ -165,45 +194,37 @@
   to { background-position: -200% 0; }
 }
 .shimmer {
-  background: linear-gradient(90deg, var(--color-border) 25%, var(--color-surface) 50%, var(--color-border) 75%);
+  background: linear-gradient(90deg, #ECEAE3 25%, #F7F6F2 50%, #ECEAE3 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite linear;
 }
 
-/* Galeri Rak Kitab (DESIGN.md 7.2) — akordeon punggung kitab */
-.rak-panel {
-  flex: 0 0 72px;
-  transition: flex 350ms cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
+/* Garis bawah animatif untuk tautan */
+.tautan-garis {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  transition: background-size 300ms var(--ease-out);
 }
-.rak-panel:hover,
-.rak-panel:focus-visible,
-.rak-panel:focus-within {
-  flex: 1 1 340px;
+.tautan-garis:hover,
+.group:hover .tautan-garis {
+  background-size: 100% 1px;
 }
-.rak-panel .rak-vertikal {
-  opacity: 1;
-  transition: opacity 150ms ease;
+
+/* Scrollbar tersembunyi untuk rak horizontal mobile */
+.tanpa-scrollbar {
+  scrollbar-width: none;
 }
-.rak-panel .rak-isi {
-  opacity: 0;
-  transition: opacity 200ms ease 100ms;
-  pointer-events: none;
-}
-.rak-panel:hover .rak-vertikal,
-.rak-panel:focus-within .rak-vertikal {
-  opacity: 0;
-}
-.rak-panel:hover .rak-isi,
-.rak-panel:focus-within .rak-isi {
-  opacity: 1;
-  pointer-events: auto;
+.tanpa-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

@@ -1,43 +1,63 @@
 import { Link } from "react-router-dom";
+import { BintangDelapan } from "../mochi/Ornamen";
+
+const KOLOM = [
+  {
+    judul: "Jelajah",
+    tautan: [
+      { ke: "/perpustakaan", label: "Perpustakaan" },
+      { ke: "/lembaga", label: "Lembaga" },
+      { ke: "/kitab", label: "Kitab rujukan" },
+      { ke: "/tanya", label: "Tanya MOCHI" },
+    ],
+  },
+  {
+    judul: "Tentang",
+    tautan: [
+      { ke: "/tentang", label: "Cara kerja" },
+      { ke: "/tentang", label: "Untuk lembaga" },
+    ],
+  },
+];
 
 export default function Footer() {
   return (
-    <footer className="mt-16 bg-primer text-teks-invers" data-testid="footer">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 md:grid-cols-3">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <img src="/mascot/mochi.jpg" alt="" className="h-10 w-10 rounded-full" />
-            <div>
-              <p className="text-lg font-bold">MOCHI</p>
-              <p className="text-xs opacity-80">Masail Online & Comprehensive Heritage Intelligence</p>
+    <footer className="mt-24 border-t border-batas" data-testid="footer">
+      <div className="mx-auto max-w-6xl px-5 pb-28 pt-14 md:pb-10">
+        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <img src="/mascot/mochi.jpg" alt="" className="h-9 w-9 rounded-full ring-1 ring-batas" />
+              <span className="text-[17px] font-semibold tracking-[-0.02em]">MOCHI</span>
             </div>
+            <p className="mt-4 max-w-sm font-display text-[26px] leading-[1.15] text-teks-utama">
+              Dari musyawarah pesantren, <em className="text-primer">untuk umat.</em>
+            </p>
+            <p className="mt-3 max-w-sm text-sm leading-relaxed text-teks-sekunder">
+              Masail Online &amp; Comprehensive Heritage Intelligence — rujukan terarsip, bukan pemberi fatwa pribadi.
+            </p>
           </div>
-          <p className="mt-4 max-w-xs text-sm opacity-80">
-            Repositori hasil bahtsul masail: jelas asalnya, jelas pengambilnya, jelas rujukannya.
-          </p>
+          {KOLOM.map((k) => (
+            <nav key={k.judul} aria-label={`Tautan ${k.judul}`}>
+              <p className="alis mb-4">{k.judul}</p>
+              <ul className="space-y-2.5 text-sm">
+                {k.tautan.map((t) => (
+                  <li key={t.label}>
+                    <Link to={t.ke} className="tautan-garis text-teks-sekunder hover:text-teks-utama">
+                      {t.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
         </div>
-        <nav aria-label="Tautan footer" className="text-sm">
-          <p className="mb-3 font-semibold">Jelajah</p>
-          <ul className="space-y-2 opacity-90">
-            <li><Link to="/perpustakaan" className="hover:underline">Perpustakaan</Link></li>
-            <li><Link to="/lembaga" className="hover:underline">Lembaga</Link></li>
-            <li><Link to="/kitab" className="hover:underline">Kitab Rujukan</Link></li>
-            <li><Link to="/tanya" className="hover:underline">Tanya MOCHI</Link></li>
-          </ul>
-        </nav>
-        <div className="text-sm">
-          <p className="mb-3 font-semibold">Untuk Lembaga</p>
-          <ul className="space-y-2 opacity-90">
-            <li><Link to="/tentang" className="hover:underline">Tentang & Cara Kerja</Link></li>
-            <li><span className="opacity-70">Pendaftaran lembaga dibuka pada Fase 6</span></li>
-          </ul>
-          <p className="mt-6 text-xs opacity-60">
-            MOCHI adalah rujukan terarsip, bukan pemberi fatwa pribadi.
-          </p>
+        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-batas pt-6 text-xs text-teks-pudar sm:flex-row sm:items-center">
+          <span className="inline-flex items-center gap-2">
+            <BintangDelapan className="h-3.5 w-3.5 text-aksen" /> Karya Lomba Santrivision 2026
+          </span>
+          <span>Rujukan terarsip, keputusan bersanad.</span>
         </div>
-      </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs opacity-70">
-        MOCHI · Karya Lomba Santrivision 2026 · Dari musyawarah pesantren, untuk umat
       </div>
     </footer>
   );

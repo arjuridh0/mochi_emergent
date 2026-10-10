@@ -1,29 +1,34 @@
+import { motion } from "motion/react";
+
 const TINGKAT = [
-  { kunci: "kecil", label: "A" },
-  { kunci: "sedang", label: "A+" },
-  { kunci: "besar", label: "A++" },
+  { kunci: "kecil", label: "A", kelas: "text-xs" },
+  { kunci: "sedang", label: "A", kelas: "text-sm" },
+  { kunci: "besar", label: "A", kelas: "text-lg" },
 ];
 
+// Ukuran huruf Arab 3 tingkat — kontrol tersegmentasi dengan indikator bergeser
 export default function PengaturanBaca({ nilai, onUbah }) {
   return (
-    <div className="rounded-2xl border border-batas bg-latar p-4" data-testid="pengaturan-baca">
-      <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-sekunder">
-        Ukuran huruf Arab
+    <div className="flex items-center justify-between gap-3" data-testid="pengaturan-baca">
+      <p className="text-sm text-teks-sekunder">
+        Huruf Arab <span className="font-arab text-base text-teks-utama" lang="ar">ع</span>
       </p>
-      <div className="flex gap-1.5" role="group" aria-label="Ukuran huruf Arab">
+      <div className="flex rounded-full bg-kanvas p-1" role="group" aria-label="Ukuran huruf Arab">
         {TINGKAT.map((t) => (
           <button
             key={t.kunci}
             onClick={() => onUbah(t.kunci)}
             data-testid={`arab-${t.kunci}`}
             aria-pressed={nilai === t.kunci}
-            className={`h-10 flex-1 rounded-md text-sm font-semibold transition-colors duration-150 ${
-              nilai === t.kunci
-                ? "bg-primer text-teks-invers"
-                : "bg-latar-halus text-teks-sekunder hover:bg-primer-muda"
+            aria-label={`Ukuran ${t.kunci}`}
+            className={`relative flex h-8 w-10 items-center justify-center rounded-full font-semibold transition-colors ${t.kelas} ${
+              nilai === t.kunci ? "text-white" : "text-teks-sekunder hover:text-teks-utama"
             }`}
           >
-            {t.label}
+            {nilai === t.kunci && (
+              <motion.span layoutId="pil-arab" className="absolute inset-0 rounded-full bg-primer" transition={{ type: "spring", stiffness: 450, damping: 34 }} />
+            )}
+            <span className="relative">{t.label}</span>
           </button>
         ))}
       </div>

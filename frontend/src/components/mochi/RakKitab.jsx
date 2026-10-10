@@ -1,111 +1,97 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowUpRight, BookMarked } from "lucide-react";
+import AccordionGallery from "../reactbits/AccordionGallery";
+import "../reactbits/AccordionGallery.css";
 import ChipTopik from "./ChipTopik";
 
-// DESIGN.md 7.2 — Galeri Rak Kitab (ReactBits AccordionGallery)
-// Punggung kitab: panel sempit dengan judul vertikal; hover/fokus melebar.
-// Mobile: geser horizontal dengan scroll-snap, isi langsung terlihat.
-
-const WARNA_PUNGGUNG = ["#1E3F30", "#4A3B2A", "#5C4632", "#2D4A3E", "#6B5B3E", "#37473F"];
-
-function Ornamen({ className = "h-4 w-4" }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <rect x="7" y="7" width="10" height="10" stroke="currentColor" strokeWidth="1.4" />
-      <rect x="7" y="7" width="10" height="10" stroke="currentColor" strokeWidth="1.4" transform="rotate(45 12 12)" />
-    </svg>
-  );
-}
+export const SAMPUL = ["/sampul/hijau.jpg", "/sampul/coklat.jpg", "/sampul/zaitun.jpg", "/sampul/marun.jpg", "/sampul/krem.jpg"];
 
 function IsiPanel({ m }) {
   return (
-    <>
-      <div className="flex items-center gap-2">
-        <Ornamen className="h-4 w-4 shrink-0 text-[#C9A96E]" />
-        <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-[11px] font-semibold text-[#F4F3EE]">
-          {m.kode}
+    <span className="flex h-full flex-col justify-between p-6 text-white">
+      <span className="flex items-center justify-between text-[11px] font-medium tracking-[0.12em] text-white/75">
+        <span>{m.kode}</span>
+        <span>{m.tahun}</span>
+      </span>
+      <span className="block">
+        <span className="mb-3 flex flex-wrap gap-1.5">
+          {m.topik.map((t) => (
+            <ChipTopik key={t} topik={t} kecil />
+          ))}
         </span>
-      </div>
-      <h3 className="mt-3 line-clamp-3 text-lg font-semibold leading-snug text-[#F4F3EE]">
-        {m.judul}
-      </h3>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {m.topik.map((t) => (
-          <ChipTopik key={t} topik={t} />
-        ))}
-      </div>
-      <div className="mt-auto border-t border-white/15 pt-3 text-xs text-[#F4F3EE]/85">
-        <p className="truncate font-medium">{m.lembaga_nama}</p>
-        <p className="mt-0.5 truncate opacity-80">{m.forum_nama} · {m.tahun}</p>
-      </div>
-      <p className="mt-3 text-xs font-semibold text-[#C9A96E]">Baca masalah →</p>
-    </>
+        <span className="block font-display text-[30px] leading-[1.05] [text-shadow:0_2px_18px_rgba(0,0,0,0.45)]">{m.judul}</span>
+        <span className="mt-3 block truncate text-[13px] text-white/80">{m.lembaga_nama}</span>
+        <span className="mt-4 flex items-center justify-between border-t border-white/20 pt-3 text-xs text-white/75">
+          <span className="inline-flex items-center gap-1.5">
+            <BookMarked className="h-3.5 w-3.5" /> {m.jumlah_rujukan} rujukan kitab
+          </span>
+          <span className="inline-flex items-center gap-1 font-medium text-white">
+            Buka <ArrowUpRight className="h-3.5 w-3.5" />
+          </span>
+        </span>
+      </span>
+    </span>
   );
 }
 
-export default function RakKitab({ masalah = [] }) {
+// DESIGN.md 7.2 — Galeri Rak Kitab memakai ReactBits AccordionGallery (desktop)
+// dan rak gulir horizontal + snap (mobile).
+export default function RakKitab({ masalah = [], tinggi = 460, testId = "rak-kitab" }) {
   const navigate = useNavigate();
   if (!masalah.length) return null;
 
-  const buka = (slug) => (e) => {
-    e.preventDefault();
-    navigate(`/masalah/${slug}`);
-  };
+  const items = masalah.map((m, i) => ({
+    image: SAMPUL[i % SAMPUL.length],
+    label: m.judul,
+    alt: "",
+    link: `/masalah/${m.slug}`,
+    spine: m.judul,
+    testId: `rak-panel-${m.slug}`,
+    m,
+  }));
+
+  const rasio = masalah.length > 8 ? 0.34 : masalah.length > 5 ? 0.42 : 0.5;
 
   return (
-    <>
-      {/* Desktop / tablet: rak akordeon */}
-      <div className="hidden h-[360px] gap-2 md:flex" data-testid="rak-kitab" role="list">
-        {masalah.map((m, i) => (
-          <a
-            key={m.slug}
-            href={`/masalah/${m.slug}`}
-            onClick={buka(m.slug)}
-            role="listitem"
-            aria-label={`${m.judul} — ${m.lembaga_nama}, ${m.tahun}`}
-            data-testid={`rak-${m.slug}`}
-            className="rak-panel group relative overflow-hidden rounded-xl shadow-mochi"
-            style={{ background: WARNA_PUNGGUNG[i % WARNA_PUNGGUNG.length] }}
-          >
-            {/* Punggung kitab (tertutup) */}
-            <div className="rak-vertikal absolute inset-0 flex flex-col items-center py-4">
-              <Ornamen className="h-4 w-4 shrink-0 text-[#C9A96E]" />
-              <span
-                className="mt-3 min-h-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-sm font-semibold text-[#F4F3EE]"
-                style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-              >
-                {m.judul}
-              </span>
-              <span className="mt-2 shrink-0 text-[11px] font-medium text-[#F4F3EE]/70">
-                {m.tahun}
-              </span>
-            </div>
-            {/* Isi (terbuka saat hover/fokus) */}
-            <div className="rak-isi absolute inset-0 flex flex-col p-5">
-              <IsiPanel m={m} />
-            </div>
-          </a>
-        ))}
+    <div data-testid={testId}>
+      <div className="hidden md:block">
+        <AccordionGallery
+          items={items}
+          defaultIndex={0}
+          height={tinggi}
+          gap={8}
+          radius={18}
+          expandRatio={rasio}
+          tilt={6}
+          parallax={0.4}
+          duration={0.65}
+          accentColor="#C9A96E"
+          overlayColor="#0E1F17"
+          textColor="#FFFFFF"
+          grayscale={false}
+          showLabels={false}
+          ariaLabel="Rak kitab: masalah bahtsul masail"
+          onNavigate={(to) => navigate(to)}
+          renderContent={(item) => <IsiPanel m={item.m} />}
+        />
       </div>
 
-      {/* Mobile: geser horizontal dengan snap */}
-      <div
-        className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:hidden"
-        data-testid="rak-kitab-mobile"
-      >
-        {masalah.map((m, i) => (
-          <a
-            key={m.slug}
-            href={`/masalah/${m.slug}`}
-            onClick={buka(m.slug)}
-            aria-label={`${m.judul} — ${m.lembaga_nama}, ${m.tahun}`}
-            data-testid={`rak-mobile-${m.slug}`}
-            className="flex w-[80%] shrink-0 snap-center flex-col rounded-xl p-5 shadow-mochi"
-            style={{ background: WARNA_PUNGGUNG[i % WARNA_PUNGGUNG.length] }}
+      <div className="tanpa-scrollbar -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 md:hidden">
+        {items.map((it) => (
+          <Link
+            key={it.link}
+            to={it.link}
+            data-testid={`rak-mobile-${it.m.slug}`}
+            className="relative h-[380px] w-[80vw] max-w-[340px] shrink-0 snap-center overflow-hidden rounded-[18px] bg-primer"
           >
-            <IsiPanel m={m} />
-          </a>
+            <img src={it.image} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+            <span className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/25 to-black/80" />
+            <span className="relative block h-full">
+              <IsiPanel m={it.m} />
+            </span>
+          </Link>
         ))}
       </div>
-    </>
+    </div>
   );
 }

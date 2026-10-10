@@ -41,13 +41,28 @@ def _cocok(token: str, teks: str) -> bool:
     return False
 
 
+# Kata tanya/penghubung umum yang tidak bermakna untuk relevansi (mis. dari Tanya MOCHI)
+KATA_UMUM = {
+    "hukum", "bagaimana", "apakah", "apa", "yang", "di", "ke", "dari", "untuk", "dan", "atau",
+    "bagi", "dengan", "boleh", "bolehkah", "tidak", "itu", "ini", "saya", "kami", "kita", "kah",
+    "secara", "dalam", "pada", "oleh", "jika", "kalau", "menurut", "islam", "fiqih", "fikih",
+    "masalah", "tentang", "soal", "ada", "adalah", "sah", "wajib", "haram", "halal", "mubah",
+}
+
+
+def _token_bermakna(qn: str) -> list:
+    semua = [t for t in qn.split() if t]
+    inti = [t for t in semua if t not in KATA_UMUM and len(t) > 1]
+    return inti or semua
+
+
 def _skor_kueri(qn: str, m: dict):
     judul = m.get("judul_norm", "")
     teks = m.get("teks_cari", "")
     kunci = m.get("kata_kunci_norm", [])
     skor = 0.0
     cocok = 0
-    for t in qn.split():
+    for t in _token_bermakna(qn):
         if not t:
             continue
         if _cocok(t, judul):
@@ -59,7 +74,7 @@ def _skor_kueri(qn: str, m: dict):
         elif _cocok(t, teks):
             skor += 1
             cocok += 1
-    sim = kemiripan(qn, judul)
+    sim = kemiripan(" ".join(_token_bermakna(qn)), judul)
     skor += 2 * sim
     if cocok == 0 and sim < 0.3:
         return None

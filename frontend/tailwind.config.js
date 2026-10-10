@@ -18,11 +18,11 @@ module.exports = {
         sm: 'calc(var(--radius) - 4px)'
       },
       colors: {
-        kanvas: 'var(--color-canvas)',
-        latar: 'var(--color-surface)',
+        kanvas: 'rgb(var(--rgb-canvas) / <alpha-value>)',
+        latar: 'rgb(var(--rgb-surface) / <alpha-value>)',
         'latar-halus': 'var(--color-surface-subtle)',
         primer: {
-          DEFAULT: 'var(--color-primary)',
+          DEFAULT: 'rgb(var(--rgb-primary) / <alpha-value>)',
           hover: 'var(--color-primary-hover)',
           aktif: 'var(--color-primary-active)',
           muda: 'var(--color-primary-light)',
@@ -30,18 +30,18 @@ module.exports = {
         },
         sekunder: 'var(--color-secondary)',
         aksen: {
-          DEFAULT: 'var(--color-accent)',
+          DEFAULT: 'rgb(var(--rgb-accent) / <alpha-value>)',
           hover: 'var(--color-accent-hover)',
           subtle: 'var(--color-accent-subtle)'
         },
         teks: {
-          utama: 'var(--color-text-primary)',
+          utama: 'rgb(var(--rgb-text) / <alpha-value>)',
           sekunder: 'var(--color-text-secondary)',
           pudar: 'var(--color-text-muted)',
           invers: 'var(--color-text-inverse)'
         },
         batas: {
-          DEFAULT: 'var(--color-border)',
+          DEFAULT: 'rgb(var(--rgb-border) / <alpha-value>)',
           kuat: 'var(--color-border-strong)',
           fokus: 'var(--color-border-focus)'
         },
@@ -97,7 +97,8 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        arab: ['Amiri', 'Noto Naskh Arabic', 'serif']
+        arab: ['Amiri', 'Noto Naskh Arabic', 'serif'],
+        display: ['Instrument Serif', 'Times New Roman', 'serif']
       },
       boxShadow: {
         mochi: 'var(--shadow-mochi-sm)',

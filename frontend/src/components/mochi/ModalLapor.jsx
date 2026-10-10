@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "../../lib/toast";
 import api from "../../lib/api";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
@@ -44,9 +44,9 @@ export default function ModalLapor({ slug, buka, onTutup }) {
 
   return (
     <Dialog open={buka} onOpenChange={(v) => !v && onTutup()}>
-      <DialogContent className="bg-latar" data-testid="modal-lapor">
+      <DialogContent className="rounded-3xl bg-latar sm:rounded-3xl" data-testid="modal-lapor">
         <DialogHeader>
-          <DialogTitle>Laporkan Konten</DialogTitle>
+          <DialogTitle className="font-display text-3xl font-normal">Laporkan konten</DialogTitle>
         </DialogHeader>
         <form onSubmit={kirim} className="space-y-4">
           <div>
@@ -58,7 +58,7 @@ export default function ModalLapor({ slug, buka, onTutup }) {
               value={alasan}
               onChange={(e) => setAlasan(e.target.value)}
               data-testid="lapor-alasan"
-              className="h-11 w-full rounded-md border border-batas bg-latar px-3 text-sm"
+              className="h-11 w-full rounded-xl border border-batas bg-latar px-3 text-sm"
             >
               {ALASAN.map((a) => (
                 <option key={a} value={a}>{a}</option>
@@ -77,7 +77,7 @@ export default function ModalLapor({ slug, buka, onTutup }) {
               rows={3}
               data-testid="lapor-detail"
               placeholder="Jelaskan singkat bagian yang bermasalah…"
-              className="w-full rounded-md border border-batas bg-latar px-3 py-2 text-sm"
+              className="w-full rounded-xl border border-batas bg-latar px-3 py-2 text-sm"
             />
           </div>
           <div>
@@ -92,7 +92,7 @@ export default function ModalLapor({ slug, buka, onTutup }) {
               maxLength={200}
               data-testid="lapor-kontak"
               placeholder="Email/HP bila bersedia dihubungi"
-              className="h-11 w-full rounded-md border border-batas bg-latar px-3 text-sm"
+              className="h-11 w-full rounded-xl border border-batas bg-latar px-3 text-sm"
             />
           </div>
           <button

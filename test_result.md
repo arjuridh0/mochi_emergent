@@ -101,3 +101,40 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+user_problem_statement: "MOCHI — repositori hasil bahtsul masail. Sesi ini: refactor total UI/UX (light mode saja, editorial modern + ornamen islami tipis, lebih ringkas & tidak membingungkan), menerapkan komponen ReactBits dari DESIGN.md (AccordionGallery = Rak Kitab, FuseButton = Salin/Kutip, SwipeToast = toast global, ThoughtLine = Tanya MOCHI), font display Instrument Serif + Inter + Amiri."
+
+frontend:
+  - task: "Refactor UI seluruh halaman publik + komponen ReactBits"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/*, frontend/src/components/mochi/*, frontend/src/components/reactbits/*"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Light-only tokens, header pil bergeser, nav bawah kapsul, Beranda baru (hero serif + KapsulPencarian placeholder berganti + statistik count-up + Rak Kitab AccordionGallery + 3 langkah + lembaga teraktif + CTA), Perpustakaan (mode Rak/Daftar via ?tampilan=, default rak tanpa q, daftar jika ada q), detail masalah editorial + tab mobile Pembahasan/Sanad, Tanya MOCHI pakai ThoughtLine + /api/search (retrieval saja, belum LLM), toast global SwipeToast menggantikan sonner."
+
+backend:
+  - task: "Pencarian mengabaikan kata umum (hukum, bagaimana, apakah, ...)"
+    implemented: true
+    working: "NA"
+    file: "backend/app/search.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "KATA_UMUM + _token_bermakna dipakai pada _skor_kueri."
+
+test_plan:
+  current_focus:
+    - "Refactor UI seluruh halaman publik + komponen ReactBits"
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "main"
+      message: "Uji ulang semua alur publik setelah refactor UI. Tidak ada auth. Lihat daftar data-testid di pesan testing."

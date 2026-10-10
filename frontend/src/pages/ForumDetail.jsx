@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { CalendarDays, MapPin, Users } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import api from "../lib/api";
 import { formatRentang } from "../lib/format";
 import { catatTayangan } from "../lib/tayangan";
 import KartuMasalah from "../components/mochi/KartuMasalah";
 import StatusKosong from "../components/mochi/StatusKosong";
 import SkeletonKartu from "../components/mochi/SkeletonKartu";
+import { Muncul } from "../components/mochi/Gerak";
 
-function BarisNama({ label, nama }) {
-  if (!nama?.length) return null;
+function Info({ label, isi }) {
+  if (!isi || (Array.isArray(isi) && !isi.length)) return null;
   return (
-    <div className="flex gap-2 text-sm">
-      <span className="w-24 shrink-0 text-teks-pudar">{label}</span>
-      <span className="text-teks-utama">{nama.join(", ")}</span>
+    <div className="py-3">
+      <dt className="alis mb-1">{label}</dt>
+      <dd className="text-sm text-teks-utama">{Array.isArray(isi) ? isi.join(", ") : isi}</dd>
     </div>
   );
 }
@@ -37,89 +38,85 @@ export default function ForumDetail() {
 
   if (status === "memuat") {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-10" aria-busy="true">
-        <div className="shimmer mb-4 h-10 w-2/3 rounded" />
+      <div className="mx-auto max-w-6xl px-5 py-14" aria-busy="true">
+        <div className="shimmer mb-8 h-14 w-2/3 rounded-xl" />
         <SkeletonKartu jumlah={3} />
       </div>
     );
   }
   if (status !== "ok") {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-16">
-        <StatusKosong
-          judul={status === "tidak-ada" ? "Forum tidak ditemukan" : "Gagal memuat"}
-          deskripsi="Tautan mungkin keliru atau forum sudah ditarik dari publik."
-          tampilkanTanya={false}
-        />
+      <div className="mx-auto max-w-2xl px-5 py-16">
+        <StatusKosong judul={status === "tidak-ada" ? "Forum tidak ditemukan" : "Gagal memuat"} deskripsi="Tautan mungkin keliru atau forum sudah ditarik dari publik." tampilkanTanya={false} />
       </div>
     );
   }
 
   const { forum, lembaga, masalah, dokumentasi } = data;
+
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8" data-testid="halaman-detail-forum">
-      <nav className="mb-5 text-sm text-teks-sekunder" aria-label="Jejak navigasi">
-        <Link to="/lembaga" className="hover:underline">Lembaga</Link>
-        {" / "}
-        <Link to={`/lembaga/${lembaga.slug}`} className="hover:underline">{lembaga.nama}</Link>
-        {" / "}
-        <span className="text-teks-utama">Forum</span>
+    <div className="mx-auto max-w-6xl px-5" data-testid="halaman-detail-forum">
+      <nav className="flex flex-wrap items-center gap-1.5 pt-8 text-[13px] text-teks-pudar" aria-label="Jejak navigasi">
+        <Link to="/lembaga" className="hover:text-teks-utama">
+          Lembaga
+        </Link>
+        <ChevronRight className="h-3.5 w-3.5" />
+        <Link to={`/lembaga/${lembaga.slug}`} className="hover:text-teks-utama">
+          {lembaga.nama}
+        </Link>
+        <ChevronRight className="h-3.5 w-3.5" />
+        <span className="text-teks-sekunder">Forum</span>
       </nav>
 
-      <header className="mb-8 rounded-2xl border border-batas bg-latar p-6 shadow-mochi md:p-8">
-        <p className="text-xs font-semibold uppercase tracking-widest text-sekunder">Forum Bahtsul Masail</p>
-        <h1 className="mt-2 text-2xl font-bold leading-tight text-teks-utama md:text-3xl">
-          {forum.nama || "Bahtsul Masail"}
-        </h1>
-        <div className="mt-4 grid gap-3 text-sm text-teks-sekunder sm:grid-cols-2">
-          <p className="flex items-center gap-2">
-            <CalendarDays className="h-4 w-4 shrink-0 text-sekunder" />
+      <header className="grid gap-10 pb-12 pt-8 md:grid-cols-[1fr_320px] md:pt-12">
+        <Muncul>
+          <p className="alis mb-4">Forum bahtsul masail</p>
+          <h1 className="font-display text-[42px] leading-[1.02] text-teks-utama md:text-[60px]">{forum.nama || "Bahtsul Masail"}</h1>
+          <p className="mt-5 text-base text-teks-sekunder">
             {formatRentang(forum.tanggal_mulai, forum.tanggal_selesai)}
-            {forum.tanggal_hijriah && <span className="text-teks-pudar">({forum.tanggal_hijriah})</span>}
-          </p>
-          <p className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 shrink-0 text-sekunder" />
-            {forum.lokasi}{forum.kota ? `, ${forum.kota}` : ""}
-          </p>
-          <p className="flex items-center gap-2">
-            <Users className="h-4 w-4 shrink-0 text-sekunder" />
-            <Link to={`/lembaga/${lembaga.slug}`} className="font-medium text-primer hover:underline">
+            {forum.tanggal_hijriah && <span className="text-teks-pudar"> · {forum.tanggal_hijriah}</span>}
+            <br />
+            {forum.lokasi}
+            {forum.kota ? `, ${forum.kota}` : ""} ·{" "}
+            <Link to={`/lembaga/${lembaga.slug}`} className="font-medium text-primer tautan-garis">
               {lembaga.nama}
             </Link>
           </p>
-          {forum.sumber_materi && <p className="text-teks-pudar">Sumber materi: {forum.sumber_materi}</p>}
-        </div>
-        <div className="mt-4 space-y-2 border-t border-batas pt-4">
-          <BarisNama label="Moderator" nama={forum.moderator} />
-          <BarisNama label="Pentashih" nama={forum.pentashih} />
-          <BarisNama label="Perumus" nama={forum.perumus} />
-        </div>
-        {forum.catatan_arsip && (
-          <p className="mt-4 border-t border-dashed border-batas pt-3 text-xs italic text-teks-pudar">{forum.catatan_arsip}</p>
-        )}
+          {forum.catatan_arsip && <p className="mt-5 border-l-2 border-batas-kuat pl-4 text-xs italic leading-relaxed text-teks-pudar">{forum.catatan_arsip}</p>}
+        </Muncul>
+        <Muncul delay={0.15} className="self-end rounded-2xl border-l-4 border-aksen bg-primer-subtle px-5 py-2">
+          <dl className="divide-y divide-primer-muda">
+            <Info label="Moderator" isi={forum.moderator} />
+            <Info label="Pentashih" isi={forum.pentashih} />
+            <Info label="Perumus" isi={forum.perumus} />
+            <Info label="Sumber materi" isi={forum.sumber_materi} />
+          </dl>
+        </Muncul>
       </header>
 
-      <h2 className="mb-4 text-xl font-bold text-teks-utama">
-        Masalah yang dibahas ({masalah.length})
+      <h2 className="mb-6 font-display text-[36px] leading-tight text-teks-utama">
+        Masalah yang dibahas <span className="text-teks-pudar">({masalah.length})</span>
       </h2>
       {masalah.length === 0 ? (
         <StatusKosong judul="Belum ada masalah" deskripsi="Forum ini belum memuat masalah terbit." tampilkanTanya={false} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="daftar-masalah-forum">
-          {masalah.map((m) => (
-            <KartuMasalah key={m.slug} m={m} />
+          {masalah.map((m, i) => (
+            <Muncul key={m.slug} delay={Math.min(i, 6) * 0.05}>
+              <KartuMasalah m={m} />
+            </Muncul>
           ))}
         </div>
       )}
 
       {dokumentasi?.length > 0 && (
-        <section className="mt-10">
-          <h2 className="mb-3 text-xl font-bold text-teks-utama">Dokumentasi</h2>
+        <section className="mt-16">
+          <p className="alis mb-4">Dokumentasi</p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3" data-testid="galeri-forum">
             {dokumentasi.map((d) => (
-              <figure key={d.id} className="overflow-hidden rounded-xl border border-batas">
-                <img src={d.url} alt={d.keterangan || "Dokumentasi forum"} className="aspect-[4/3] w-full object-cover" loading="lazy" />
-                <figcaption className="bg-latar p-2 text-xs text-teks-sekunder">{d.keterangan}</figcaption>
+              <figure key={d.id} className="group overflow-hidden rounded-xl bg-latar">
+                <img src={d.url} alt={d.keterangan || "Dokumentasi forum"} className="aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                <figcaption className="p-3 text-xs text-teks-sekunder">{d.keterangan}</figcaption>
               </figure>
             ))}
           </div>

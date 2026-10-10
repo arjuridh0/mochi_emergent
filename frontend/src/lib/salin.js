@@ -1,11 +1,15 @@
-import { toast } from "sonner";
+import { toast } from "./toast";
 
-// navigator.clipboard butuh izin; sediakan fallback execCommand agar selalu berhasil
+// navigator.clipboard butuh izin; sediakan fallback execCommand agar selalu berhasil.
+// pesanSukses = null → tidak menampilkan toast sukses (umpan balik cukup dari tombol).
 export async function salinTeks(teks, pesanSukses = "Tersalin!") {
+  const sukses = () => {
+    if (pesanSukses) toast.success(pesanSukses, { duration: 2000 });
+    return true;
+  };
   try {
     await navigator.clipboard.writeText(teks);
-    toast.success(pesanSukses);
-    return true;
+    return sukses();
   } catch {
     try {
       const area = document.createElement("textarea");
@@ -16,13 +20,10 @@ export async function salinTeks(teks, pesanSukses = "Tersalin!") {
       area.select();
       const ok = document.execCommand("copy");
       document.body.removeChild(area);
-      if (ok) {
-        toast.success(pesanSukses);
-        return true;
-      }
+      if (ok) return sukses();
       throw new Error("gagal");
     } catch {
-      toast.error("Gagal menyalin. Salin manual ya.");
+      toast.error("Gagal menyalin. Salin manual ya.", { duration: 4000 });
       return false;
     }
   }

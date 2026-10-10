@@ -1,17 +1,26 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { SlidersHorizontal, X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { LayoutGrid, Library, SlidersHorizontal, X } from "lucide-react";
 import api from "../lib/api";
+import { LABEL_TOPIK } from "../lib/format";
 import KapsulPencarian from "../components/mochi/KapsulPencarian";
 import PanelFilter from "../components/mochi/PanelFilter";
 import KartuMasalah from "../components/mochi/KartuMasalah";
+import RakKitab from "../components/mochi/RakKitab";
 import Paginasi from "../components/mochi/Paginasi";
 import StatusKosong from "../components/mochi/StatusKosong";
 import SkeletonKartu from "../components/mochi/SkeletonKartu";
-import { Sheet, SheetContent, SheetTrigger } from "../components/ui/sheet";
+import KepalaHalaman from "../components/mochi/KepalaHalaman";
+import { varianAnak, varianInduk } from "../components/mochi/Gerak";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
 const KUNCI_FILTER = ["topik", "lembaga", "tahun", "kitab", "jenis"];
+const MODE = [
+  { kunci: "rak", label: "Rak Kitab", ikon: Library },
+  { kunci: "daftar", label: "Daftar", ikon: LayoutGrid },
+];
 
 export default function Perpustakaan() {
   const [params, setParams] = useSearchParams();
@@ -26,6 +35,8 @@ export default function Perpustakaan() {
   const q = nilai.q || "";
   const urut = nilai.urut || "relevan";
   const hal = parseInt(nilai.hal || "1", 10);
+  // Tanpa kata kunci: Rak Kitab (DESIGN.md 7.2). Dengan kata kunci: Daftar (sorotan kata lebih terbaca).
+  const mode = nilai.tampilan === "daftar" || nilai.tampilan === "rak" ? nilai.tampilan : q ? "daftar" : "rak";
 
   useEffect(() => {
     api.get("/opsi-filter").then((r) => setOpsi(r.data)).catch(() => {});
@@ -34,19 +45,22 @@ export default function Perpustakaan() {
   useEffect(() => {
     setMemuat(true);
     setGalat(false);
+    const p = Object.fromEntries(params.entries());
+    delete p.tampilan;
     api
-      .get("/search", { params: Object.fromEntries(params.entries()) })
+      .get("/search", { params: p })
       .then((r) => setData(r.data))
       .catch(() => setGalat(true))
       .finally(() => setMemuat(false));
-  }, [params]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.toString().replace(/(^|&)tampilan=[^&]*/, "")]);
 
   const ubah = useCallback(
     (kunci, v) => {
       const baru = new URLSearchParams(params);
       if (v) baru.set(kunci, v);
       else baru.delete(kunci);
-      if (kunci !== "hal") baru.delete("hal");
+      if (kunci !== "hal" && kunci !== "tampilan") baru.delete("hal");
       setParams(baru);
     },
     [params, setParams]
@@ -57,34 +71,46 @@ export default function Perpustakaan() {
     if (kueri) baru.set("q", kueri);
     if (topik && topik !== "semua") baru.set("topik", topik);
     if (tahun && tahun !== "semua") baru.set("tahun", tahun);
+    if (nilai.tampilan) baru.set("tampilan", nilai.tampilan);
     setParams(baru);
   };
 
   const chipAktif = [];
-  if (q) chipAktif.push({ kunci: "q", label: `"${q}"` });
+  if (q) chipAktif.push({ kunci: "q", label: `“${q}”` });
   KUNCI_FILTER.forEach((k) => {
     if (!nilai[k]) return;
     if (k === "topik") {
-      nilai[k].split(",").filter(Boolean).forEach((t) =>
-        chipAktif.push({ kunci: "topik", nilai: t, label: `Topik: ${t}` })
-      );
+      nilai[k]
+        .split(",")
+        .filter(Boolean)
+        .forEach((t) => chipAktif.push({ kunci: "topik", nilai: t, label: LABEL_TOPIK[t] || t }));
     } else if (k === "lembaga") {
       const l = opsi?.lembaga?.find((x) => x.slug === nilai[k]);
-      chipAktif.push({ kunci: k, label: `Lembaga: ${l?.nama || nilai[k]}` });
+      chipAktif.push({ kunci: k, label: l?.nama || nilai[k] });
     } else if (k === "kitab") {
       const kb = opsi?.kitab?.find((x) => x.slug === nilai[k]);
-      chipAktif.push({ kunci: k, label: `Kitab: ${kb?.nama_latin || nilai[k]}` });
+      chipAktif.push({ kunci: k, label: kb?.nama_latin || nilai[k] });
     } else {
-      chipAktif.push({ kunci: k, label: `${k[0].toUpperCase() + k.slice(1)}: ${nilai[k]}` });
+      chipAktif.push({ kunci: k, label: `${k[0].toUpperCase() + k.slice(1)} ${nilai[k]}` });
     }
   });
+  const jumlahFilter = chipAktif.filter((c) => c.kunci !== "q").length;
 
   const panel = <PanelFilter opsi={opsi} nilai={nilai} onUbah={ubah} />;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8" data-testid="halaman-perpustakaan">
-      <h1 className="mb-6 text-2xl font-bold text-teks-utama md:text-3xl">Perpustakaan</h1>
-      <div className="mb-5">
+    <div className="mx-auto max-w-6xl px-5" data-testid="halaman-perpustakaan">
+      <KepalaHalaman
+        alis="Perpustakaan"
+        judul={
+          <>
+            Telusuri arsip <em className="text-primer">keputusan.</em>
+          </>
+        }
+        deskripsi="Cari dengan bahasa sehari-hari atau teks Arab. Saring berdasarkan topik, lembaga, tahun, dan kitab rujukan."
+      />
+
+      <div className="mb-6">
         <KapsulPencarian
           nilaiAwal={q}
           topikAwal={nilai.topik && !nilai.topik.includes(",") ? nilai.topik : "semua"}
@@ -94,60 +120,97 @@ export default function Perpustakaan() {
         />
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      {/* Bilah alat: jumlah hasil, chip aktif, mode tampilan, urutan */}
+      <div className="mb-6 flex flex-wrap items-center gap-2 border-b border-batas pb-4">
         <Sheet open={filterBuka} onOpenChange={setFilterBuka}>
           <SheetTrigger asChild>
             <button
               data-testid="tombol-filter-mobile"
-              className="inline-flex h-10 items-center gap-2 rounded-full border border-batas bg-latar px-4 text-sm font-medium text-teks-sekunder lg:hidden"
+              className="inline-flex h-9 items-center gap-2 rounded-full bg-latar px-4 text-[13px] font-medium text-teks-utama ring-1 ring-batas lg:hidden"
             >
-              <SlidersHorizontal className="h-4 w-4" /> Filter
+              <SlidersHorizontal className="h-3.5 w-3.5" /> Filter
+              {jumlahFilter > 0 && (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primer px-1.5 text-[11px] text-white">{jumlahFilter}</span>
+              )}
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto rounded-t-3xl bg-latar">
-            <p className="mb-4 text-lg font-semibold">Filter</p>
+          <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-[28px] border-0 bg-kanvas px-5 pb-8">
+            <div className="mx-auto mb-5 mt-1 h-1 w-10 rounded-full bg-batas-kuat" aria-hidden />
+            <SheetTitle className="mb-5 font-display text-3xl font-normal">Saring hasil</SheetTitle>
             {panel}
             <button
               onClick={() => setFilterBuka(false)}
               data-testid="terapkan-filter"
-              className="mt-5 h-11 w-full rounded-full bg-primer text-sm font-semibold text-teks-invers"
+              className="mt-6 h-12 w-full rounded-full bg-primer text-sm font-semibold text-white"
             >
-              Terapkan
+              Tampilkan {data?.total ?? ""} hasil
             </button>
           </SheetContent>
         </Sheet>
 
-        {chipAktif.map((c, i) => (
-          <button
-            key={`${c.kunci}-${c.nilai || i}`}
-            onClick={() => {
-              if (c.kunci === "topik" && c.nilai) {
-                const sisa = (nilai.topik || "").split(",").filter((x) => x && x !== c.nilai);
-                ubah("topik", sisa.join(","));
-              } else {
-                ubah(c.kunci, "");
-              }
-            }}
-            data-testid={`chip-filter-${i}`}
-            className="inline-flex h-8 items-center gap-1.5 rounded-full bg-primer-muda px-3 text-xs font-medium text-primer"
-          >
-            {c.label} <X className="h-3 w-3" />
-          </button>
-        ))}
+        <p className="mr-2 text-sm text-teks-sekunder" data-testid="jumlah-hasil">
+          {memuat || !data ? "Mencari…" : (
+            <>
+              <span className="font-semibold text-teks-utama">{data.total}</span> masalah ditemukan
+            </>
+          )}
+        </p>
+
+        <AnimatePresence initial={false}>
+          {chipAktif.map((c, i) => (
+            <motion.button
+              layout
+              key={`${c.kunci}-${c.nilai || c.label}`}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              onClick={() => {
+                if (c.kunci === "topik" && c.nilai) {
+                  const sisa = (nilai.topik || "").split(",").filter((x) => x && x !== c.nilai);
+                  ubah("topik", sisa.join(","));
+                } else {
+                  ubah(c.kunci, "");
+                }
+              }}
+              data-testid={`chip-filter-${i}`}
+              className="inline-flex h-8 items-center gap-1.5 rounded-full bg-primer-muda px-3 text-xs font-medium text-primer transition-colors hover:bg-[#d3e3da]"
+            >
+              {c.label} <X className="h-3 w-3" />
+            </motion.button>
+          ))}
+        </AnimatePresence>
         {chipAktif.length > 0 && (
           <button
-            onClick={() => navigate("/perpustakaan")}
+            onClick={() => navigate(nilai.tampilan ? `/perpustakaan?tampilan=${nilai.tampilan}` : "/perpustakaan")}
             data-testid="reset-filter"
-            className="text-xs font-medium text-bahaya hover:underline"
+            className="px-1 text-xs font-medium text-teks-pudar underline-offset-4 hover:text-bahaya hover:underline"
           >
-            Reset
+            Hapus semua
           </button>
         )}
 
         <div className="ml-auto flex items-center gap-2">
-          <label htmlFor="urut" className="text-xs text-teks-pudar">Urutkan:</label>
+          <div className="flex rounded-full bg-latar p-1 ring-1 ring-batas" role="group" aria-label="Mode tampilan" data-testid="mode-tampilan">
+            {MODE.map(({ kunci, label, ikon: Ikon }) => (
+              <button
+                key={kunci}
+                onClick={() => ubah("tampilan", kunci)}
+                data-testid={`mode-${kunci}`}
+                aria-pressed={mode === kunci}
+                className={`relative inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-colors ${
+                  mode === kunci ? "text-white" : "text-teks-sekunder hover:text-teks-utama"
+                }`}
+              >
+                {mode === kunci && (
+                  <motion.span layoutId="pil-mode" className="absolute inset-0 rounded-full bg-teks-utama" transition={{ type: "spring", stiffness: 450, damping: 34 }} />
+                )}
+                <Ikon className="relative h-3.5 w-3.5" />
+                <span className="relative hidden sm:inline">{label}</span>
+              </button>
+            ))}
+          </div>
           <Select value={urut} onValueChange={(v) => ubah("urut", v === "relevan" ? "" : v)}>
-            <SelectTrigger id="urut" data-testid="pilih-urutan" className="h-10 w-36 border-batas bg-latar text-sm">
+            <SelectTrigger id="urut" aria-label="Urutkan" data-testid="pilih-urutan" className="h-10 w-[132px] rounded-full border-0 bg-latar text-[13px] ring-1 ring-batas focus:ring-1 focus:ring-batas-kuat focus:ring-offset-0">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -159,32 +222,40 @@ export default function Perpustakaan() {
         </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
-        <aside className="hidden lg:block">
-          <div className="sticky top-24 rounded-2xl border border-batas bg-latar p-5 shadow-mochi">
-            {panel}
-          </div>
+      <div className="grid gap-10 lg:grid-cols-[232px_1fr]">
+        <aside className="hidden lg:block" aria-label="Filter">
+          <div className="sticky top-24">{panel}</div>
         </aside>
-        <div>
-          {memuat && <SkeletonKartu jumlah={6} />}
+        <div className="min-w-0">
+          {memuat && (mode === "rak" ? <div className="shimmer h-[460px] w-full rounded-[18px]" /> : <SkeletonKartu jumlah={6} kolom="sm:grid-cols-2" />)}
           {!memuat && galat && (
-            <p className="rounded-xl bg-bahaya-muda p-4 text-sm text-bahaya" role="alert" data-testid="galat-pencarian">
+            <p className="rounded-2xl bg-bahaya-muda p-4 text-sm text-bahaya" role="alert" data-testid="galat-pencarian">
               Pencarian gagal dimuat. Periksa koneksi Anda lalu coba lagi.
             </p>
           )}
           {!memuat && !galat && data && (
             <>
-              <p className="mb-4 text-sm text-teks-sekunder" data-testid="jumlah-hasil">
-                {data.total} masalah ditemukan
-              </p>
               {data.hasil.length === 0 ? (
                 <StatusKosong />
-              ) : (
-                <div className="grid gap-4 sm:grid-cols-2" data-testid="hasil-pencarian">
-                  {data.hasil.map((m) => (
-                    <KartuMasalah key={m.slug} m={m} sorot={q} />
-                  ))}
+              ) : mode === "rak" ? (
+                <div data-testid="hasil-pencarian">
+                  <RakKitab key={params.toString()} masalah={data.hasil} tinggi={480} testId="rak-hasil" />
                 </div>
+              ) : (
+                <motion.div
+                  key={params.toString()}
+                  variants={varianInduk}
+                  initial="tersembunyi"
+                  animate="tampil"
+                  className="grid gap-4 sm:grid-cols-2"
+                  data-testid="hasil-pencarian"
+                >
+                  {data.hasil.map((m) => (
+                    <motion.div key={m.slug} variants={varianAnak}>
+                      <KartuMasalah m={m} sorot={q} />
+                    </motion.div>
+                  ))}
+                </motion.div>
               )}
               <Paginasi hal={hal} total={data.total} perHal={data.per_hal} onPindah={(h) => ubah("hal", String(h))} />
             </>
