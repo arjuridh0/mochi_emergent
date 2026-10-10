@@ -1,56 +1,64 @@
 import { useEffect } from "react";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
-import { HOME } from "@/constants/testIds";
+import { Toaster } from "@/components/ui/sonner";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import NavBawah from "@/components/layout/NavBawah";
+import TombolTanya from "@/components/mochi/TombolTanya";
+import Beranda from "@/pages/Beranda";
+import Perpustakaan from "@/pages/Perpustakaan";
+import MasalahDetail from "@/pages/MasalahDetail";
+import ForumDetail from "@/pages/ForumDetail";
+import LembagaDaftar from "@/pages/LembagaDaftar";
+import LembagaProfil from "@/pages/LembagaProfil";
+import KitabDaftar from "@/pages/KitabDaftar";
+import KitabDetail from "@/pages/KitabDetail";
+import Tanya from "@/pages/Tanya";
+import Tentang from "@/pages/Tentang";
+import TidakDitemukan from "@/pages/TidakDitemukan";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
+function GulungKeAtas() {
+  const { pathname } = useLocation();
   useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    // The marker attribute below lets the platform probe detect the stock splash — remove it with this page
-    <div data-emergent-splash>
-      <header className="App-header">
-        <a
-          data-testid={HOME.emergentLink}
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 function App() {
+  const demo = process.env.REACT_APP_DEMO_MODE === "true";
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <BrowserRouter>
+      <GulungKeAtas />
+      <div className="flex min-h-screen flex-col bg-kanvas text-teks-utama">
+        {demo && (
+          <div data-testid="banner-demo" className="bg-aksen-subtle px-3 py-1.5 text-center text-xs font-medium text-teks-utama">
+            Prototype untuk penilaian Santrivision 2026
+          </div>
+        )}
+        <Header />
+        <main id="konten" className="flex-1 pb-20 md:pb-0">
+          <Routes>
+            <Route path="/" element={<Beranda />} />
+            <Route path="/perpustakaan" element={<Perpustakaan />} />
+            <Route path="/masalah/:slug" element={<MasalahDetail />} />
+            <Route path="/forum/:slug" element={<ForumDetail />} />
+            <Route path="/lembaga" element={<LembagaDaftar />} />
+            <Route path="/lembaga/:slug" element={<LembagaProfil />} />
+            <Route path="/kitab" element={<KitabDaftar />} />
+            <Route path="/kitab/:slug" element={<KitabDetail />} />
+            <Route path="/tanya" element={<Tanya />} />
+            <Route path="/tentang" element={<Tentang />} />
+            <Route path="*" element={<TidakDitemukan />} />
+          </Routes>
+        </main>
+        <Footer />
+        <TombolTanya />
+        <NavBawah />
+        <Toaster richColors position="top-center" />
+      </div>
+    </BrowserRouter>
   );
 }
 
